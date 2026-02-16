@@ -33,7 +33,7 @@ export const userLogin = async (req, res) => {
     res.status(200).json({
       message: "Login successfully.",
       user: payload,
-      profile_image:users_find.profile_image,
+      profile_image: users_find.profile_image,
       token: user_token,
     });
   } catch (error) {
@@ -46,8 +46,6 @@ export const userRegistration = async (request, response) => {
     const data = request.body;
     const file = request.file;
 
-    console.log(file);
-    console.log(data);
 
     const existingUser = await User.findOne({ email: data.email });
 
@@ -61,7 +59,7 @@ export const userRegistration = async (request, response) => {
       name: data.name,
       email: data.email,
       password: hash_password,
-      profile_image: file.path,
+      profile_image: file?.path ?? "", //file is not uploded to used a nullesh operator
       description: data.description || null,
     });
     await user_data.save();

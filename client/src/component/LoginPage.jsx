@@ -1,6 +1,7 @@
-import React, { Children, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "../api/axios";
-import { useNavigate } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [state, setState] = useState("signin");
@@ -10,6 +11,7 @@ const LoginPage = () => {
     email: "",
     password: "",
     phone: "",
+    confirmpass: "",
   });
 
   const navigate = useNavigate();
@@ -35,7 +37,9 @@ const LoginPage = () => {
     setFile(e.target.files[0]);
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
     switch (state) {
       case "signin":
         try {
@@ -43,8 +47,6 @@ const LoginPage = () => {
             email: formdata.email,
             password: formdata.password,
           });
-
-          console.log(response);
 
           if (response.status === 200) {
             // console.log(response.data);
@@ -74,10 +76,8 @@ const LoginPage = () => {
               },
             },
           );
-          console.log(response);
 
           if (response.status === 200) {
-            console.log(response);
             setState("signin");
           }
         } catch (error) {
@@ -89,14 +89,21 @@ const LoginPage = () => {
           const response = await axios.post("/");
 
           if (response.status === 200) {
-            console.log(response.data);
+            console.log(response.data); //handle a backend not completed
           }
         } catch (error) {
           console.log(error);
         }
         break;
       default:
-        console.log("state not found");
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          phone: "",
+        });
+        setFile = null;
+
         break;
     }
   };
@@ -109,11 +116,15 @@ const LoginPage = () => {
             FaceBook
           </p>
           <hr className="text-white mb-3" />
-          <h3 className="text-center pb-3 font-black text-2xl text-white">
-            Sign In
+          <h3 className="text-center pb-3 font text-2xl text-white">
+            {state === "signin"
+              ? "Login"
+              : state === "signup"
+                ? "Create Account"
+                : "Forget Password"}
           </h3>
           <div className="p-2 text-center text-white   ">
-            <form action="" className="grid grid-row-1 gap-4">
+            <form className="grid grid-row-1 gap-4" onSubmit={handleLogin}>
               {state === "signup" && (
                 <>
                   <div className=" ">
@@ -136,6 +147,7 @@ const LoginPage = () => {
                       onChange={handlechange}
                       name="name"
                       id="name"
+                      required
                     />
                   </div>
                 </>
@@ -150,6 +162,7 @@ const LoginPage = () => {
                   onChange={handlechange}
                   name="email"
                   id="email"
+                  required
                 />
               </div>
               <div className="grid grid-cols-2 place-items-center">
@@ -162,6 +175,7 @@ const LoginPage = () => {
                   name="password"
                   placeholder="••••••••"
                   id="password"
+                  required
                 />
               </div>
               {state === "forget_password" && (
@@ -169,32 +183,60 @@ const LoginPage = () => {
                   <label htmlFor="password">Confirm Password </label>
                   <input
                     type="password"
-                    value={formdata.confirmPass}
+                    value={formdata.confirmpass}
                     onChange={handlechange}
                     className="border rounded-2xl p-1 focus:outline-white"
-                    name="confirmPass"
+                    name="confirmpass"
                     placeholder="••••••••"
-                    id="confirmPass"
+                    id="confirmpass"
+                    required
                   />
                 </div>
               )}
-
-              <input type="checkbox" name="remember" id="" required />
+              <div className="flex relative left-15 gap-3 ">
+                <input type="checkbox" name="remember" id="remember" required />
+                <label htmlFor="remember">I agree to the terms</label>
+              </div>
               <button
-                type="button"
-                onClick={() => handleLogin()}
-                className="bg-white p-2  w-full text-blue-700 font-bold text-2xl transition-all duration-300  rounded-2xl m-3 "
+                type="submit"
+                className="bg-white p-2 active:scale-95  w-full text-blue-700 font-bold text-2xl transition-all duration-200  rounded-2xl m-3 "
                 value="Login"
               >
-                Login
+                {state === "signin"
+                  ? "Login"
+                  : state === "signup"
+                    ? "Create Account"
+                    : "forget password"}
               </button>
             </form>
+
+            {state === "signin" && (
+              <Link to={"#"} onClick={() => setState("forget_password")}>
+                forget password ?
+              </Link>
+            )}
+
+            {state === "forget_password" && (
+              <Link to={"#"} onClick={() => setState("signup")}>
+                Create New Account ?
+              </Link>
+            )}
+
+            {state === "signup" && (
+              <Link to={"#"} onClick={() => setState("signin")}>
+                allready account ?
+              </Link>
+            )}
 
             <hr />
             <section className="m-3">
               <div>
                 <p>Other Option</p>
-                <p>Facebook</p>
+                <div className="flex justify-center gap-20 pt-3">
+                  <div className="backdrop-blur-md p-1 rounded-2xl justify-items-center-safe w-full hover:scale-99 duration-200  bg-gray-400 ">
+                    <FcGoogle className="text-2xl " />
+                  </div>
+                </div>
               </div>
             </section>
           </div>
