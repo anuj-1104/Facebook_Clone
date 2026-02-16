@@ -15,7 +15,7 @@ const app = express();
 //middleware origin websites
 app.use(cors());
 const corsOption = {
-  origin: "http://localhost:5173",
+  origin: "https://facebook-clone-psi-nine.vercel.app",
   optionsSuccessStatus: true,
 };
 
