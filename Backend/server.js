@@ -13,7 +13,7 @@ const app = express();
 //middleware origin websites
 app.use(cors());
 const corsOption = {
-  origin: "https://facebook-clone-psi-nine.vercel.app/",
+  origin: "https://facebook-clone-psi-nine.vercel.app",
   optionsSuccessStatus: true,
 };
 
