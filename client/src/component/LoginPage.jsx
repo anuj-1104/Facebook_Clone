@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Children, useEffect, useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
@@ -20,7 +20,7 @@ const LoginPage = () => {
     if (token) {
       window.location.href = "/home";
     }
-  }, []);
+  }, [token]);
 
   const handlechange = (e) => {
     const { name, value } = e.target;

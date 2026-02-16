@@ -24,6 +24,7 @@ const Navbar = () => {
       <div className=" w-full z-999  bg-white h-auto fixed  ">
         <header className="grid grid-cols-2 justify-between pt-2 ">
           <h2
+            onClick={() => navigate("/home")}
             className="pl-2 text-3xl font-extrabold text-blue-700  "
             style={{ fontFamily: "SN Pro" }}
           >

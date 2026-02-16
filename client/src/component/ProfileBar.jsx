@@ -1,13 +1,23 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import profile_image from "../assets/profile_icon.png";
 import { LuImages } from "react-icons/lu";
 
 const ProfileBar = () => {
   const navigate = useNavigate();
-  const [searchquery, setSearchQuery] = useState("");
+  const [searchquery, setSearchQuery] = useState({
+    search: "",
+  });
 
   const profile_image = localStorage.getItem("profile_image");
+
+  const handlechange = (e) => {
+    const { name, value } = e.target;
+
+    setSearchQuery((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handllerProfile = () => {
     navigate("/profile");
@@ -15,7 +25,7 @@ const ProfileBar = () => {
 
   //fiexed the ui
   return (
-    <div className="w-full grid grid-cols-2  bg-white  fixed top-20">
+    <div className="w-full grid grid-cols-2 z-10000 bg-white  fixed top-20">
       <div className="p-2 flex gap-4">
         <img
           src={`http://localhost:8080/${profile_image}`} //used a express static routes
@@ -27,8 +37,9 @@ const ProfileBar = () => {
         <input
           type="text"
           name="search"
-          value={searchquery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchquery.search}
+          spellCheck="false"
+          onChange={handlechange}
           className="text-black p-1 relative left-12  border-2 rounded-2xl "
           placeholder="What's on your mind ? "
         />
