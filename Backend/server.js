@@ -7,15 +7,39 @@ import path from "path";
 import UserRoutes from "./Routes/UserRoutes.js";
 
 dotenv.config();
-await database_connect();
+
 const port = process.env.PORT;
 
 const app = express();
 
+let isConnected = false;
+
+const connectDB = async () => {
+  if (isConnected) return;
+
+  try {
+    const db = await database_connect();
+    isConnected = db?.connections?.[0]?.readyState === 1;
+    console.log("MongoDB connected");
+  } catch (error) {
+    console.error("DB connection error:", error);
+    throw error;
+  }
+};
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    return res.status(500).json({ error: "Database connection failed" });
+  }
+});
+
 //middleware origin websites
 app.use(cors());
 const corsOption = {
-  origin: "https://facebook-clone-psi-nine.vercel.app",
+  origin: "",
   optionsSuccessStatus: true,
 };
 
@@ -35,6 +59,4 @@ app.get("/", (_, res) => {
 //all Routes others
 app.use("/api/user", UserRoutes);
 
-app.listen(port, () => {
-  console.log(`server is running on - http://localhost:${port}`);
-});
+export default app;
