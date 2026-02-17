@@ -34,7 +34,3 @@ app.get("/", (_, res) => {
 
 //all Routes others
 app.use("/api/user", UserRoutes);
-
-app.listen(port, () => {
-  console.log(`server is running on - http://localhost:${port}`);
-});
