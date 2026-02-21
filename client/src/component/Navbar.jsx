@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
 import { FaUserFriends } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
@@ -11,13 +11,18 @@ const Navbar = () => {
   const [active, setActive] = useState(1);
   // const [model, setModel] = useState(false);   //handle a model setting
 
-  const { token, navigate } = useAppcontext();
+  const { navigate } = useAppcontext();
 
   const handleLogout = () => {
-    alert("Logout !");
     localStorage.clear();
     navigate("/");
   };
+
+  //used a navlink automatic set the routes
+  const activeclass = ({ isActive }) =>
+    `text-2xl transition duration-200 ${
+      isActive ? "text-blue-700" : "text-gray-600"
+    }`;
 
   return (
     <>
@@ -43,26 +48,18 @@ const Navbar = () => {
           style={{ textAlign: "-webkit-center" }}
           className="grid grid-cols-4 justify-center items-center p-2 text-black"
         >
-          <Link to={"/home"} onClick={() => setActive(1)}>
-            <FaHome
-              className={`text-2xl ${active === 1 ? "text-blue-700" : "text-black"}  focus:text-blue-700`}
-            />
-          </Link>
-          <Link to={"/friends"} onClick={() => setActive(2)}>
-            <FaUserFriends
-              className={`text-2xl ${active === 2 ? "text-blue-700" : "text-black"}  focus:text-blue-700`}
-            />
-          </Link>
-          <Link to={"/notification"} onClick={() => setActive(3)}>
-            <IoNotifications
-              className={`text-2xl ${active === 3 ? "text-blue-700" : "text-black"}  focus:text-blue-700`}
-            />
-          </Link>
-          <Link to={"/treading"} onClick={() => setActive(4)}>
-            <RiSlideshow3Fill
-              className={`text-2xl ${active === 4 ? "text-blue-700" : "text-black"}  focus:text-blue-700`}
-            />{" "}
-          </Link>
+          <NavLink to="/home" className={activeclass}>
+            <FaHome />
+          </NavLink>
+          <NavLink to="/friends" className={activeclass}>
+            <FaUserFriends />
+          </NavLink>
+          <NavLink to="/notification" className={activeclass}>
+            <IoNotifications />
+          </NavLink>
+          <NavLink to="/trending" className={activeclass}>
+            <RiSlideshow3Fill />{" "}
+          </NavLink>
         </nav>
         <hr />
       </div>

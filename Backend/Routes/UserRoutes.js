@@ -7,6 +7,8 @@ import {
   updateDataPost,
   update_like,
   add_Comment,
+  User_lists,
+  AllPost,
 } from "../controller/UserController.js";
 import UserAuth from "../middleware/UserAuth.js";
 import { upload } from "../middleware/UploadFile.js";
@@ -21,10 +23,13 @@ user_Router.post(
 );
 user_Router.post("/post", UserAuth, userPost);
 user_Router.post("/allpost", userAllPost);
+user_Router.get("/all/post", AllPost);
 user_Router.patch("/update/:id", updateDataPost);
 
+user_Router.get("/allusers", UserAuth, User_lists);
+
 //public access
-user_Router.patch("/like/:id", update_like);
-user_Router.patch("/comment/:id", add_Comment);
+user_Router.patch("/like/id", UserAuth, update_like);
+user_Router.patch("/comment/:id", UserAuth, add_Comment);
 
 export default user_Router;

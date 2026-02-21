@@ -5,6 +5,7 @@ import database_connect from "./database/db.js";
 import { fileURLToPath } from "url";
 import path from "path";
 import UserRoutes from "./Routes/UserRoutes.js";
+import FrindsRoutes from "./Routes/FriendRoutes.js";
 
 dotenv.config();
 
@@ -13,7 +14,6 @@ const port = process.env.PORT;
 const app = express();
 
 let isConnected = false;
-
 const connectDB = async () => {
   if (isConnected) return;
 
@@ -58,5 +58,8 @@ app.get("/", (_, res) => {
 
 //all Routes others
 app.use("/api/user", UserRoutes);
+app.use("/api/request", FrindsRoutes);
 
-export default app;
+app.listen(port, () => {
+  console.log(`server run on http://localhost:${port}`);
+});

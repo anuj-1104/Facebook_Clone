@@ -8,7 +8,7 @@ if (!token) {
 const create_api = axios.create({
   baseURL: import.meta.env.VITE_SERVER_URL,
   headers: {
-    Authorization: token ? `Bearer ${token}` : "",
+    Authorization: `Bearer ${token}`,
   },
 });
 

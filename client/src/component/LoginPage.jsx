@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "../api/axios";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
+import { useReducer } from "react";
 
 const LoginPage = () => {
   const [state, setState] = useState("signin");
   const [file, setFile] = useState(null);
+  const imageRef = useRef(null);
   const [formdata, setFormData] = useState({
     name: "",
     email: "",
@@ -13,6 +15,10 @@ const LoginPage = () => {
     phone: "",
     confirmpass: "",
   });
+
+  const handleImage = () => {
+    imageRef.current.click();
+  };
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -35,6 +41,8 @@ const LoginPage = () => {
 
   const handllerfileChange = (e) => {
     setFile(e.target.files[0]);
+    const [file] = profile_image.files;
+    blash.src = URL.createObjectURL(file);
   };
 
   const handleLogin = async (e) => {
@@ -52,7 +60,7 @@ const LoginPage = () => {
             // console.log(response.data);
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("profile_image", response.data.profile_image);
-            localStorage.setItem("user", JSON.stringify(response.data.user)); //object to convert json
+            localStorage.setItem("user", JSON.stringify(response.data.user));
             navigate("/home");
           }
         } catch (error) {
@@ -102,8 +110,6 @@ const LoginPage = () => {
           password: "",
           phone: "",
         });
-        setFile = null;
-
         break;
     }
   };
@@ -127,15 +133,14 @@ const LoginPage = () => {
             <form className="grid grid-row-1 gap-4" onSubmit={handleLogin}>
               {state === "signup" && (
                 <>
-                  <div className=" ">
-                    <input
-                      type="file"
-                      name="profile_image"
-                      id="profile_image"
+                  <div className="justify-items-center-safe">
+                    <img
+                      src="#"
+                      id="blash"
+                      onClick={handleImage}
+                      alt="your image"
                       className="rounded-full w-20 h-20 border bg-white"
-                      onChange={handllerfileChange}
                     />
-                    <p>Profile Image</p>
                   </div>
                   <div className="grid grid-cols-2 place-items-center">
                     <label htmlFor="name">Name </label>
@@ -150,9 +155,19 @@ const LoginPage = () => {
                       required
                     />
                   </div>
+
+                  {/* used of the input a profile image*/}
+                  <input
+                    type="file"
+                    name="profile_image"
+                    id="profile_image"
+                    ref={imageRef}
+                    style={{ display: "none" }}
+                    onChange={handllerfileChange}
+                  />
                 </>
               )}
-              <div className="grid  grid-cols-2 place-items-center">
+              <div className="grid grid-cols-2 place-items-center">
                 <label htmlFor="email">Email </label>
                 <input
                   type="email"

@@ -7,6 +7,7 @@ const user_model = new mongoose.Schema({
   profile_image: { type: String },
   role: { type: String, default: "User" },
   description: { type: String },
+  friends: [{ type: Object }],
   timestamp: { type: Date, default: Date.now },
 });
 

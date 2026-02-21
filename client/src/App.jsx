@@ -38,7 +38,7 @@ const App = () => {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/friends" element={<Friends_Page />} />
             <Route path="/notification" element={<Notification_Page />} />
-            <Route path="/treading" element={<Tranding_Page />} />
+            <Route path="/trending" element={<Tranding_Page />} />
           </Route>
         </Routes>
       </div>

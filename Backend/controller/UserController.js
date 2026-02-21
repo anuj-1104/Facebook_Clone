@@ -46,7 +46,6 @@ export const userRegistration = async (request, response) => {
     const data = request.body;
     const file = request.file;
 
-
     const existingUser = await User.findOne({ email: data.email });
 
     if (existingUser) {
@@ -70,12 +69,40 @@ export const userRegistration = async (request, response) => {
   }
 };
 
+export const User_lists = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const allusers = await User.find().select("-password");
+    if (!allusers) {
+      return res.status(404).json({ message: "users not found" });
+    }
+
+    //can not response user login
+    const data = allusers.filter(
+      (item) => item._id.toString() != user.toString(),
+    );
+
+    res.status(200).json({ data: data });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error " });
+  }
+};
+
 export const userPost = async (req, res) => {
   try {
     const requestData = req.body;
+    const user_id = req.user;
+    const response = await User.findOne({ _id: user_id });
+
+    if (!response) {
+      return res.send(404).json({ message: "User Not Found" });
+    }
 
     const postData = new Post({
-      user_id: req.user,
+      user_id: response._id,
+      user_name: response.name,
+      profile_image: response.profile_image,
       image_url: requestData.image_url,
       description: requestData.description,
       comment: requestData.comment,
@@ -93,7 +120,21 @@ export const userAllPost = async (req, res) => {
   try {
     const { user_id } = req.body;
     const userPost = await Post.find({ user_id: user_id });
-    if (!userPost) {
+
+    if (userPost.length <= 0) {
+      res.status(401).json({ message: "User Post Not Found " });
+      return;
+    }
+    res.status(200).json({ message: "find post", data: userPost });
+  } catch (errot) {
+    res.status(500).json({ message: "Internal Server Error " });
+  }
+};
+export const AllPost = async (_, res) => {
+  try {
+    const userPost = await Post.find();
+
+    if (userPost.length <= 0) {
       res.status(401).json({ message: "User Post Not Found " });
       return;
     }
@@ -131,7 +172,7 @@ export const updateDataPost = async (req, res) => {
 
 export const update_like = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.body;
 
     const post_Data = await Post.findByIdAndUpdate(
       id,

@@ -1,21 +1,44 @@
-import React from "react";
-import { useAppcontext } from "../contaxt/Appcontext";
+import React, { useEffect, useState } from "react";
+import axios from "../api/axios";
 
 const Notification_Page = () => {
-  const { profile_image } = useAppcontext();
+  const [notification, setNotification] = useState([]);
+
+  useEffect(() => {
+    const handllerNotifi = async () => {
+      try {
+        const response = await axios.get("/api/request/friend/notification");
+
+        if (response.status === 200) {
+          console.log(response);
+          setNotification(response.data.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    handllerNotifi();
+  }, []);
+
   return (
-    <div className=" relative top-20">
-      <div className="p-4 flex gap-4 ">
-        <img
-          src={profile_image}
-          alt="image_profile"
-          className="w-8 h-8 border rounded-full"
-        />
-        <p className="text-2xl">name</p>
-      </div>
-      <div className="p-4 pt-0">
-        <p>Lorem, ipsum dolor sit amet consectetur adipisicing.</p>
-      </div>
+    <div className="bg-gray-200 min-h-screen ">
+      {notification &&
+        notification.map((items, key) => (
+          <div key={key} className=" relative top-20 bg-gray-400 mb-1">
+            <div className="p-4 pb-0 flex gap-3 ">
+              <img
+                src={`http://localhost:8080/${items.profile_image}`}
+                alt="image_profile"
+                className=" border  w-8 h-8 rounded-full"
+              />
+              <p className="font-medium">{items.name}</p>
+            </div>
+            <div className="justify-items-center-safe">
+              <p>{`Lorem, ipsum dolor sit amet consectetur.`}</p>
+            </div>
+            <hr className="" />
+          </div>
+        ))}
     </div>
   );
 };

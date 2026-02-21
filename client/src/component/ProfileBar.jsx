@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LuImages } from "react-icons/lu";
 
@@ -7,6 +7,20 @@ const ProfileBar = () => {
   const [searchquery, setSearchQuery] = useState({
     search: "",
   });
+
+  const fileInputRef = useRef(null);
+  const handleImage = () => {
+    fileInputRef.current.click();
+  };
+
+  //select only single image access
+  const handdlerfile = (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      console.log(`file is selected : ${file.name}`);
+    }
+  };
 
   const profile_image = localStorage.getItem("profile_image");
 
@@ -40,12 +54,21 @@ const ProfileBar = () => {
           value={searchquery.search}
           spellCheck="false"
           onChange={handlechange}
-          className="text-black p-1 relative left-12  border-2 rounded-2xl "
+          className="text-black p-1 relative left-12 placeholder-black font-medium border-2 placeholder:font-medium outline-0 rounded-2xl "
           placeholder="What's on your mind ? "
         />
       </div>
+      <input
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        ref={fileInputRef}
+        onChange={handdlerfile}
+      />
       <div className="flex flex-row-reverse p-3">
-        <LuImages className="text-4xl justify-end-safe" />
+        <button onClick={handleImage}>
+          <LuImages className="text-4xl justify-end-safe" />
+        </button>
       </div>
       <hr />
       <hr />
