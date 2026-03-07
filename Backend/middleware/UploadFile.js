@@ -9,12 +9,4 @@ const storage = multer.diskStorage({
   },
 });
 
-// const filter = (req, file, cal) => {
-//   if (file.) {
-//     cal(null, true);
-//   } else {
-//     cal(new Error("Only image file are allowed"));
-//   }
-// };
-
 export const upload = multer({ storage: storage });

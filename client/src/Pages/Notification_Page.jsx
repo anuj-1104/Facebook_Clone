@@ -3,6 +3,7 @@ import axios from "../api/axios";
 
 const Notification_Page = () => {
   const [notification, setNotification] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const handllerNotifi = async () => {
@@ -14,17 +15,18 @@ const Notification_Page = () => {
           setNotification(response.data.data);
         }
       } catch (error) {
-        console.log(error);
+        console.log(error.response);
+        setError(error.response.data.message);
       }
     };
     handllerNotifi();
   }, []);
 
   return (
-    <div className="bg-gray-200 min-h-screen ">
-      {notification &&
+    <div className="bg-gray-200 min-h-screen relative top-20">
+      {notification.length > 0 ? (
         notification.map((items, key) => (
-          <div key={key} className=" relative top-20 bg-gray-400 mb-1">
+          <div key={key} className="  bg-gray-400 mb-1">
             <div className="p-4 pb-0 flex gap-3 ">
               <img
                 src={`http://localhost:8080/${items.profile_image}`}
@@ -38,7 +40,14 @@ const Notification_Page = () => {
             </div>
             <hr className="" />
           </div>
-        ))}
+        ))
+      ) : (
+        <div className="bg-white justify-items-center-safe min-h-screen p-10">
+          <div className="bg-black/20 rounded w-full">
+            <p className="text-black/60 font-medium p-2 text-center">{error}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

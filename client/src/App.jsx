@@ -5,7 +5,7 @@ import LoginPage from "./component/LoginPage";
 import Home from "./Pages/Home";
 import Navbar from "./component/Navbar";
 import ProfilePage from "./Pages/ProfilePage";
-import Friends_Page from "./Pages/Friends_Page";
+import FriendsPage from "./Pages/FriendsPage";
 import Notification_Page from "./Pages/Notification_Page";
 import Tranding_Page from "./Pages/Tranding_Page";
 import UserProtected from "./protected/UserProtected";
@@ -13,14 +13,12 @@ import { useAppcontext } from "./contaxt/Appcontext";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
-
   const { token } = useAppcontext();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
     }, 4000);
-
     return () => clearTimeout(timer);
   }, [token]);
 
@@ -36,7 +34,7 @@ const App = () => {
           <Route element={<UserProtected />}>
             <Route path="/home" element={<Home />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/friends" element={<Friends_Page />} />
+            <Route path="/friends" element={<FriendsPage />} />
             <Route path="/notification" element={<Notification_Page />} />
             <Route path="/trending" element={<Tranding_Page />} />
           </Route>

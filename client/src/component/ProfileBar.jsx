@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";     
 import { useNavigate } from "react-router-dom";
 import { LuImages } from "react-icons/lu";
 
@@ -42,7 +42,7 @@ const ProfileBar = () => {
     <div className="w-full grid grid-cols-2 z-10000 bg-white  fixed top-20">
       <div className="p-2 flex gap-4">
         <img
-          src={`http://localhost:8080/${profile_image}`} //used a express static routes
+          src={`${profile_image}`} //used a express static routes
           alt="profile_image"
           onClick={handllerProfile}
           className="rounded-full w-10 fixed h-10"

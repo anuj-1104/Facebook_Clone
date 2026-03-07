@@ -14,6 +14,7 @@ const Navbar = () => {
   const { navigate } = useAppcontext();
 
   const handleLogout = () => {
+    alert("LogOut");
     localStorage.clear();
     navigate("/");
   };
@@ -36,11 +37,7 @@ const Navbar = () => {
             facebook
           </h2>
           <div className="justify-items-end-safe ">
-            <HiDotsVertical
-              className="text-3xl pt-2"
-              // onClick={() => setModel((prev) => !prev)} //change a any satge true/false
-              onClick={handleLogout}
-            />
+            <HiDotsVertical className="text-3xl pt-2" onClick={handleLogout} />
           </div>
         </header>
 

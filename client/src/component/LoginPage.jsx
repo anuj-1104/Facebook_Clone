@@ -2,20 +2,21 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "../api/axios";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
-import { useReducer } from "react";
 
 const LoginPage = () => {
   const [state, setState] = useState("signin");
   const [file, setFile] = useState(null);
   const imageRef = useRef(null);
+  const [error, setError] = useState("");
   const [formdata, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     phone: "",
-    confirmpass: "",
+    confirm_pass: "",
   });
 
+  //click a image to ref to access a hidden field access
   const handleImage = () => {
     imageRef.current.click();
   };
@@ -41,12 +42,14 @@ const LoginPage = () => {
 
   const handllerfileChange = (e) => {
     setFile(e.target.files[0]);
-    const [file] = profile_image.files;
-    blash.src = URL.createObjectURL(file);
-  };
+    const [file] = profile_image.files; //access first image
+    blash.src = URL.createObjectURL(file); //access a property of image id to src
+  }; //used a method to create a url and pass on the src property in image element render image
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    setError("");
 
     switch (state) {
       case "signin":
@@ -57,14 +60,13 @@ const LoginPage = () => {
           });
 
           if (response.status === 200) {
-            // console.log(response.data);
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("profile_image", response.data.profile_image);
             localStorage.setItem("user", JSON.stringify(response.data.user));
             navigate("/home");
           }
         } catch (error) {
-          console.log(error);
+          setError(error.response.data.message);
         }
         break;
       case "signup":
@@ -89,17 +91,25 @@ const LoginPage = () => {
             setState("signin");
           }
         } catch (error) {
+          setError(error.response.data.message);
+
           console.log(error.response);
         }
         break;
       case "forget_password":
         try {
-          const response = await axios.post("/");
+          const response = await axios.patch("/api/user/forget_password", {
+            email: formdata.email,
+            password: formdata.password,
+            confirm_pass: formdata.confirm_pass,
+          });
 
           if (response.status === 200) {
-            console.log(response.data); //handle a backend not completed
+            console.log(response); //handle a backend not completed
+            setState("signin");
           }
         } catch (error) {
+          setError(error.response.data.message);
           console.log(error);
         }
         break;
@@ -110,43 +120,41 @@ const LoginPage = () => {
           password: "",
           phone: "",
         });
+        setError("");
         break;
     }
   };
 
   return (
     <>
-      <div className="grid place-items-center h-screen select-none">
-        <div className=" border rounded-2xl p-3 w-99 max-h-max  bg-blue-600">
-          <p className="text-center text-2xl font-extrabold text-white">
-            FaceBook
-          </p>
-          <hr className="text-white mb-3" />
-          <h3 className="text-center pb-3 font text-2xl text-white">
-            {state === "signin"
-              ? "Login"
-              : state === "signup"
-                ? "Create Account"
-                : "Forget Password"}
-          </h3>
-          <div className="p-2 text-center text-white   ">
-            <form className="grid grid-row-1 gap-4" onSubmit={handleLogin}>
+      <div className="grid grid-cols-1 md:grid-cols-2 h-screen select-none">
+        <div className="hidden md:flex items-center justify-center bg-white">
+          <div className="text-center px-8">
+            <h1 className="text-6xl font-bold text-blue-600 mb-4">facebook</h1>
+            <p className="text-2xl text-gray-700">
+              Connect with friends and the world around you on Facebook.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center bg-gray-100">
+          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+            <form className="space-y-4" onSubmit={handleLogin}>
               {state === "signup" && (
                 <>
-                  <div className="justify-items-center-safe">
+                  <div className="flex justify-center mb-4">
                     <img
                       src="#"
                       id="blash"
                       onClick={handleImage}
-                      alt="your image"
-                      className="rounded-full w-20 h-20 border bg-white"
+                      alt="Profile Image"
+                      className="rounded-full w-20 h-20 border-2 border-gray-300 bg-gray-200 cursor-pointer"
                     />
                   </div>
-                  <div className="grid grid-cols-2 place-items-center">
-                    <label htmlFor="name">Name </label>
+                  <div>
                     <input
                       type="text"
-                      className=" rounded-2xl  p-1  border focus:outline-white"
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter your Name"
                       value={formdata.name}
                       onChange={handlechange}
@@ -156,7 +164,7 @@ const LoginPage = () => {
                     />
                   </div>
 
-                  {/* used of the input a profile image*/}
+                  {/* Hidden file input for profile image */}
                   <input
                     type="file"
                     name="profile_image"
@@ -167,12 +175,12 @@ const LoginPage = () => {
                   />
                 </>
               )}
-              <div className="grid grid-cols-2 place-items-center">
-                <label htmlFor="email">Email </label>
+
+              <div>
                 <input
                   type="email"
-                  className=" rounded-2xl  p-1  border focus:outline-white"
-                  placeholder="Enter your Email"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Email address or phone number"
                   value={formdata.email}
                   onChange={handlechange}
                   name="email"
@@ -180,80 +188,114 @@ const LoginPage = () => {
                   required
                 />
               </div>
-              <div className="grid grid-cols-2 place-items-center">
-                <label htmlFor="password">Password </label>
+
+              <div>
                 <input
                   type="password"
                   value={formdata.password}
                   onChange={handlechange}
-                  className="border rounded-2xl p-1 focus:outline-white"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   name="password"
-                  placeholder="••••••••"
+                  placeholder="Password"
                   id="password"
                   required
                 />
               </div>
+
               {state === "forget_password" && (
-                <div className="grid grid-cols-2 place-items-center">
-                  <label htmlFor="password">Confirm Password </label>
+                <div>
                   <input
                     type="password"
-                    value={formdata.confirmpass}
+                    value={formdata.confirm_pass}
                     onChange={handlechange}
-                    className="border rounded-2xl p-1 focus:outline-white"
-                    name="confirmpass"
-                    placeholder="••••••••"
-                    id="confirmpass"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    name="confirm_pass"
+                    placeholder="Confirm Password"
+                    id="confirm_pass"
                     required
                   />
                 </div>
               )}
-              <div className="flex relative left-15 gap-3 ">
-                <input type="checkbox" name="remember" id="remember" required />
-                <label htmlFor="remember">I agree to the terms</label>
-              </div>
+
+              {error && (
+                <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 rounded">
+                  <p className="font-medium">{error}</p>
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="bg-white p-2 active:scale-95  w-full text-blue-700 font-bold text-2xl transition-all duration-200  rounded-2xl m-3 "
-                value="Login"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md transition duration-200"
               >
                 {state === "signin"
-                  ? "Login"
+                  ? "Log In"
                   : state === "signup"
                     ? "Create Account"
-                    : "forget password"}
+                    : "Reset Password"}
               </button>
+
+              {state === "signin" && (
+                <div className="text-center">
+                  <a
+                    href="#"
+                    onClick={() => setState("forget_password")}
+                    className="text-blue-600 hover:underline text-sm"
+                  >
+                    Forgotten password?
+                  </a>
+                </div>
+              )}
+
+              {state === "signin" && (
+                <div className="border-t pt-4 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setState("signup")}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md transition duration-200"
+                  >
+                    Create New Account
+                  </button>
+                </div>
+              )}
+
+              {state === "signup" && (
+                <div className="text-center mt-4">
+                  <a
+                    href="#"
+                    onClick={() => setState("signin")}
+                    className="text-blue-600 hover:underline text-sm"
+                  >
+                    Already have an account?
+                  </a>
+                </div>
+              )}
+
+              {state === "forget_password" && (
+                <div className="text-center mt-4">
+                  <a
+                    href="#"
+                    onClick={() => setState("signin")}
+                    className="text-blue-600 hover:underline text-sm"
+                  >
+                    Back to Login
+                  </a>
+                </div>
+              )}
             </form>
 
             {state === "signin" && (
-              <Link to={"#"} onClick={() => setState("forget_password")}>
-                forget password ?
-              </Link>
-            )}
-
-            {state === "forget_password" && (
-              <Link to={"#"} onClick={() => setState("signup")}>
-                Create New Account ?
-              </Link>
-            )}
-
-            {state === "signup" && (
-              <Link to={"#"} onClick={() => setState("signin")}>
-                allready account ?
-              </Link>
-            )}
-
-            <hr />
-            <section className="m-3">
-              <div>
-                <p>Other Option</p>
-                <div className="flex justify-center gap-20 pt-3">
-                  <div className="backdrop-blur-md p-1 rounded-2xl justify-items-center-safe w-full hover:scale-99 duration-200  bg-gray-400 ">
-                    <FcGoogle className="text-2xl " />
-                  </div>
+              <div className="mt-6 pt-4 border-t text-center">
+                <p className="text-sm text-gray-600 mb-3">Other Options</p>
+                <div className="flex justify-center">
+                  <button className="flex items-center justify-center bg-white border border-gray-300 rounded-md p-2 hover:bg-gray-50 transition duration-200">
+                    <FcGoogle className="text-xl" />
+                    <span className="ml-2 text-sm font-medium">
+                      Continue with Google
+                    </span>
+                  </button>
                 </div>
               </div>
-            </section>
+            )}
           </div>
         </div>
       </div>

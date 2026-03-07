@@ -2,12 +2,18 @@ import { Router } from "express";
 import {
   friendsRequest,
   friNotification,
+  requestconform,
+  requestController,
 } from "../controller/FriendsController.js";
 import userAuthMiddleware from "../middleware/UserAuth.js";
 
-const FrindsRoutes = Router();
+const FriendsRoutes = Router();
 
-FrindsRoutes.post("/friend/request", userAuthMiddleware, friendsRequest);
-FrindsRoutes.get("/friend/notification", friNotification);
+FriendsRoutes.get("/friend/allrequest", requestController);
 
-export default FrindsRoutes;
+FriendsRoutes.post("/friend/request", userAuthMiddleware, friendsRequest);
+FriendsRoutes.get("/friend/notification", friNotification);
+
+FriendsRoutes.post("/friend/confirmreq", requestconform);
+
+export default FriendsRoutes;

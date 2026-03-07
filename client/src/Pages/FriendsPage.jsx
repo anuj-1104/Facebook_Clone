@@ -100,7 +100,7 @@ const Friends_Page = () => {
             <div key={index} className="bg-gray-300 m-2  border ">
               <div className="p-3  h-auto w-full flex gap-5">
                 <img
-                  src={`http://localhost:8080/${item.profile_image}`}
+                  src={item.profile_image}
                   alt={item.profile_image}
                   className="w-10 h-10 rounded-full"
                 />
@@ -128,7 +128,7 @@ const Friends_Page = () => {
             <div key={key} className="bg-gray-200 m-2 border-b-0 border">
               <div className="p-3  h-auto w-full flex gap-5">
                 <img
-                  src={`http://localhost:8080/${items.profile_image}`}
+                  src={items.profile_image}
                   alt={items.profile_image}
                   className="w-10 h-10 rounded-full"
                 />

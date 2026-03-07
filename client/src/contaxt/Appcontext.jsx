@@ -5,7 +5,6 @@ import axios from "../api/axios";
 
 export const Appcontext = createContext();
 
-//import in main file access all child
 export const ContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const [friendsrequest, setFriendsRequest] = useState([]);
@@ -13,23 +12,27 @@ export const ContextProvider = ({ children }) => {
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user");
 
-  useEffect(() => {
-    const NotificationFriends = async () => {
-      try {
-        const response = await axios.get("/api/request/friend/notification");
+  const handlerlikes = async (id) => {
+    try {
+      const response = await axios.patch("api/user/like/id", { id }); //used only end point
 
-        if (response.status === 200) {
-          setFriendsRequest(response.data.data);
-        }
-      } catch (error) {
-        console.log(error);
+      if (response.status === 200) {
+        return id;
       }
-    };
+    } catch (error) {
+      console.error(`error: ${error.response}`);
+      return null;
+    }
+  };
 
-    NotificationFriends();
-  }, [token]);
-
-  const value = { navigate, profile_image, token, friendsrequest, user };
+  const value = {
+    navigate,
+    profile_image,
+    token,
+    friendsrequest,
+    user,
+    handlerlikes,
+  };
   return <Appcontext.Provider value={value}>{children}</Appcontext.Provider>;
 };
 
