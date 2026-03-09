@@ -49,7 +49,6 @@ app.use(async (req, res, next) => {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-
 //default Routes
 app.get("/", (_, res) => {
   return res

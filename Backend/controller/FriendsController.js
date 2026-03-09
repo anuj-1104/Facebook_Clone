@@ -1,62 +1,59 @@
+import axios from "axios";
 import { Friends } from "../model/Friends_Model.js";
 import { User } from "../model/User_Model.js";
 
 export const friendsRequest = async (req, res) => {
   try {
-    const { request } = req.body;
-    const sender = req.user;
+    const { receiver } = req.body;
+    const sender = req.user._id;
 
-    // const postdata = new Friends({
-    //   request: request.request,
-    //   sender: user,
-    // });
+    console.log(receiver, sender);
 
+    // Check if request already exists
     const existing = await Friends.findOne({
-      sender,
-      request,
-      status: "unfriend",
+      $or: [
+        { sender, receiver },
+        { sender: receiver, receiver: sender },
+      ],
     });
 
     if (existing) {
-      res.status(400).json({ message: "Request already existing" });
+      return res.status(400).json({ message: "Request already exists" });
     }
-    const friendsRequest = new Friends({
-      sender,
-      reciver: request,
-      status: "unfriend",
+
+    // Create friend request
+    const friendRequest = await Friends.create({
+      sender: sender,
+      receiver: receiver,
+      status: "pending",
     });
 
-    const response = await friendsRequest.save();
-
-    if (!response) {
-      res.status(404).json({ message: "user not found" });
+    if (!friendRequest) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // const user_find = await User.findOne({ _id: response.request });
+    console.log(friendRequest);
 
-    // await User.updateOne(
-    //   { _id: user_find._id },
-    //   { $push: { friends: response.sender } },
-    // );
-
-    //handle a friends request & response .
-    res.status(200).json({ message: "friend request sent" });
+    res.status(200).json({
+      message: "Friend request sent successfully",
+      data: friendRequest,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Internal server Error " });
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export const friNotification = async (_, res) => {
+export const friNotification = async (req, res) => {
   try {
-    const friends = await Friends.find({});
+    const friends = await Friends.find();
+
     const senderIds = friends
       .filter((data) => data.status !== "friends")
       .map((f) => f.sender);
 
-
-      //set the correct status code
     if (!senderIds) {
-      return res.status(301).json({ message: "friend request not found" });
+      return res.status(404).json({ message: "friend request not found" });
     }
 
     const response = await User.find({
@@ -64,10 +61,11 @@ export const friNotification = async (_, res) => {
     }).select("-password");
 
     if (response.length <= 0) {
-      return res.status(301).json({ message: "Notification not found " });
+      return res.status(404).json({ message: "Notification not found " });
     }
+    console.log(response);
 
-    res.status(200).json({ data: response });
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: `error: ${error}` });
   }
@@ -113,7 +111,11 @@ export const requestController = async (req, res) => {
       return res.status(404).json({ message: "Not Found" });
     }
 
-    res.status(200).json({ message: "request found ", data: response });
+    const requests = response.filter((item) => item.status !== "friends");
+
+    const data = res
+      .status(200)
+      .json({ message: "request found ", data: requests });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }

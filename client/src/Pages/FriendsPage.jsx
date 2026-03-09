@@ -12,6 +12,21 @@ const Friends_Page = () => {
   const { token, friendsrequest, user } = useAppcontext();
 
   useEffect(() => {
+    const findFriendsRequest = async () => {
+      try {
+        const response = await axios.get("/api/request/friend/notification");
+
+        if (response.status === 200) {
+          console.log(response);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    findFriendsRequest();
+  }, []);
+
+  useEffect(() => {
     const result = friendsrequest.filter((pre) => pre._id !== user._id);
 
     setFriendReq(result);
@@ -53,9 +68,17 @@ const Friends_Page = () => {
 
   const handllerfriends = async (request) => {
     try {
-      const response = await axios.post("/api/request/friend/request", {
-        request: request,
-      });
+      const response = await axios.post(
+        "/api/request/friend/request",
+        {
+          request: request,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       console.log(response);
       if (response.status === 200) {
         setRequest(response.data.message);

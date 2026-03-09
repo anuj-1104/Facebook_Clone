@@ -30,6 +30,14 @@ const FriendsList = () => {
       name: "jay  bhoi",
       profile_image: profile_image,
     },
+    {
+      name: "jay  bhoi",
+      profile_image: profile_image,
+    },
+    {
+      name: "jay  bhoi",
+      profile_image: profile_image,
+    },
   ];
   return (
     <div className="relative  z-1000 top-12 m-2 border ">

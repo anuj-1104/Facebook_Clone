@@ -2,25 +2,26 @@ import React, { useEffect, useState } from "react";
 import axios from "../api/axios";
 
 const Notification_Page = () => {
-  const [notification, setNotification] = useState([]);
+  const [notification, setNotification] = useState({});
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  useEffect(()=>{
+
     const handllerNotifi = async () => {
       try {
         const response = await axios.get("/api/request/friend/notification");
-
+        console.log(response);
         if (response.status === 200) {
           console.log(response);
-          setNotification(response.data.data);
+          setNotification(response.data);
         }
       } catch (error) {
         console.log(error.response);
-        setError(error.response.data.message);
+        setError(error?.response?.data?.message);
       }
     };
     handllerNotifi();
-  }, []);
+  },[]);
 
   return (
     <div className="bg-gray-200 min-h-screen relative top-20">
@@ -29,7 +30,7 @@ const Notification_Page = () => {
           <div key={key} className="  bg-gray-400 mb-1">
             <div className="p-4 pb-0 flex gap-3 ">
               <img
-                src={`http://localhost:8080/${items.profile_image}`}
+                src={items.profile_image}
                 alt="image_profile"
                 className=" border  w-8 h-8 rounded-full"
               />
