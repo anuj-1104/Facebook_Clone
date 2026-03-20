@@ -149,17 +149,53 @@ export const FrogetPassword = async (req, res) => {
   }
 };
 
+// export const  userFind = async (req, res) => {
+//   try {
+//     const { _id } = req.body;
+//     const response = await User.findById(_id).select("-password");
+//     if (!response) {
+//       return res.status(404).json({ message: "User Not Found" });
+//     }
+
+//     res.status(200).json({ message: "Login User Data..", data: response });
+//   } catch (error) {
+//     return res.status(500).json({ messsage: "Internal Server Error " });
+//   }
+// };
+
 export const userFind = async (req, res) => {
   try {
-    const { _id } = req.body;
-    const response = await User.findById(_id);
-    if (!response) {
-      return res.status(404).json({ message: "User Not Found" });
+    const { ids } = req.body;
+
+    if (!ids || !Array.isArray(ids)) {
+      return res.status(400).json({
+        message: "Invalid ID list",
+        type: typeof ids,
+      });
     }
 
-    res.status(200).json({ message: "Login User Data..", data: response });
+    //removed duplicate id used a set
+    const uniqueIds = [...new Set(ids)];
+
+    const users = await User.find({
+      _id: { $in: uniqueIds },
+    }).select("-password");
+
+    console.log(users);
+
+    if (!users.length) {
+      return res.status(404).json({ message: "No users found" });
+    }
+
+    res.status(200).json({
+      message: "Users fetched successfully",
+      data: users,
+    });
   } catch (error) {
-    return res.status(500).json({ messsage: "Internal Server Error " });
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
   }
 };
 
@@ -176,6 +212,8 @@ export const User_lists = async (req, res) => {
     const data = allusers.filter(
       (item) => item._id.toString() != user.toString(),
     );
+
+    console.log(data);
 
     res.status(200).json({ data: data });
   } catch (error) {
@@ -314,12 +352,6 @@ export const ProfileController = async (req, res) => {
 
     const response = await User.findById(user_id);
 
-    if (!bio || !location || !personal || !information) {
-      return res
-        .status(200)
-        .josn({ message: "send new data .", data: response });
-    }
-
     if (!response) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -340,5 +372,28 @@ export const ProfileController = async (req, res) => {
     res.status(200).json({ message: "user data updated", data: user_update });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error " });
+  }
+};
+
+export const UserfriendsController = async (req, res) => {
+  try {
+    const _id = req.user;
+
+    if (!_id) {
+      return res.status(400).josn({ message: "User Not Found" });
+    }
+
+    const user = await User.findById(_id).select("-password");
+
+    if (!user) {
+      return res.staus(404).josn({ message: "User Not Found" });
+    }
+
+    const allfriends = user?.friends;
+    // const filterfriends=allfriends
+
+    res.status(200).json({ message: "All Friends", friends: allfriends });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };

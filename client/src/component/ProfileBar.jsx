@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";     
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LuImages } from "react-icons/lu";
 
@@ -17,9 +17,10 @@ const ProfileBar = () => {
   const handdlerfile = (event) => {
     const file = event.target.files[0];
 
-    if (file) {
-      console.log(`file is selected : ${file.name}`);
-    }
+    //Debugging Purpose
+    // if (file) {
+    //   console.log(`file is selected : ${file.name}`);
+    // }
   };
 
   const profile_image = localStorage.getItem("profile_image");

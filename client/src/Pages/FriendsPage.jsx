@@ -15,9 +15,8 @@ const Friends_Page = () => {
     const findFriendsRequest = async () => {
       try {
         const response = await axios.get("/api/request/friend/notification");
-
         if (response.status === 200) {
-          console.log(response);
+          setFriendReq(response.data);
         }
       } catch (error) {
         console.log(error);
@@ -29,10 +28,10 @@ const Friends_Page = () => {
   useEffect(() => {
     const result = friendsrequest.filter((pre) => pre._id !== user._id);
 
-    setFriendReq(result);
-  }, [data]);
-
-  // console.log(friendreq);
+    if (result) {
+      setFriendReq(result);
+    }
+  }, []);
 
   const handlechange = (e) => {
     const value = e.target.value.toLowerCase();
@@ -53,7 +52,6 @@ const Friends_Page = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response);
         if (response.status === 200) {
           setData(response.data.data);
           setFriendsData(response.data.data);
@@ -64,7 +62,7 @@ const Friends_Page = () => {
     };
 
     handlerfriends();
-  }, [request]);
+  }, []);
 
   const handllerfriends = async (request) => {
     try {
@@ -79,7 +77,6 @@ const Friends_Page = () => {
           },
         },
       );
-      console.log(response);
       if (response.status === 200) {
         setRequest(response.data.message);
       }
@@ -147,20 +144,20 @@ const Friends_Page = () => {
         <br />
 
         {data.length > 0 ? (
-          friendsdata.map((items, key) => (
+          friendsdata.map((user, key) => (
             <div key={key} className="bg-gray-200 m-2 border-b-0 border">
               <div className="p-3  h-auto w-full flex gap-5">
                 <img
-                  src={items.profile_image}
-                  alt={items.profile_image}
+                  src={user.profile_image}
+                  alt={user.profile_image}
                   className="w-10 h-10 rounded-full"
                 />
 
-                <p>{items.name}</p>
+                <p>{user.name}</p>
               </div>
               <div className="grid grid-cols-2 gap-3 p-2">
                 <button
-                  onClick={() => handllerfriends(items._id)}
+                  onClick={() => handllerfriends(user._id)}
                   className="text-white bg-blue-600 p-2 hover:bg-blue-700  font-medium duration-300 "
                 >
                   Add friend

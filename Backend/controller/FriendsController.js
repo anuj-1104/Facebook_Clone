@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Friends } from "../model/Friends_Model.js";
 import { User } from "../model/User_Model.js";
 
@@ -32,7 +31,6 @@ export const friendsRequest = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log(friendRequest);
 
     res.status(200).json({
       message: "Friend request sent successfully",

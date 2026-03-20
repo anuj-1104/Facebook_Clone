@@ -13,6 +13,7 @@ import {
   userFind,
   ProfileController,
   CurrentUser,
+  UserfriendsController,
 } from "../controller/UserController.js";
 import UserAuth from "../middleware/UserAuth.js";
 // import { upload } from "../middleware/UploadFile.js";
@@ -27,10 +28,11 @@ user_Router.post(
   userRegistration,
 );
 
-// user_Router.get("/curr/user", CurrentUser);
+user_Router.get("/curr/user",UserAuth, CurrentUser);
 
 user_Router.post("/login/user", userFind);
 user_Router.patch("/forget_password", FrogetPassword);
+user_Router.get("/friends", UserAuth, UserfriendsController);
 user_Router.post("/post", UserAuth, userPost);
 user_Router.post("/allpost", userAllPost);
 user_Router.get("/all/post", AllPost);
@@ -44,3 +46,4 @@ user_Router.patch("/like/id", UserAuth, update_like);
 user_Router.patch("/comment/id", UserAuth, add_Comment);
 
 export default user_Router;
+// /api/user/edit/profile

@@ -7,7 +7,7 @@ const friends_model = new mongoose.Schema(
     reciver: { type: String },
     status: { type: String, default: "unfriend" },
   },
-  { timestamp: { type: Date, default: Date.now } },
+  { timestamps: true },
 );
 
 export const Friends = mongoose.model("friends", friends_model);

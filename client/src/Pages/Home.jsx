@@ -59,7 +59,7 @@ const Home = () => {
 
         // Refresh posts after comment
         const updated = await axios.get("/api/user/all/post");
-        setFriendsPost(updated?.data?.data || []);
+        setFriendsPost(updated?.data?.data ?? []);
 
         setTimeout(() => {
           if (commentScrollRef.current) {
@@ -96,7 +96,9 @@ const Home = () => {
                     src={items?.profile_image}
                     alt={items?.user_name}
                   />
-                  <p className="font-bold relative top-2">{items?.user_name}</p>
+                  <p className="font-bold relative top-2 capitalize">
+                    {items?.user_name}
+                  </p>
                 </div>
 
                 <button
