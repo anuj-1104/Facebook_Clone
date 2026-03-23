@@ -5,8 +5,7 @@ const Notification_Page = () => {
   const [notification, setNotification] = useState({});
   const [error, setError] = useState("");
 
-  useEffect(()=>{
-
+  useEffect(() => {
     const handllerNotifi = async () => {
       try {
         const response = await axios.get("/api/request/friend/notification");
@@ -16,15 +15,14 @@ const Notification_Page = () => {
           setNotification(response.data);
         }
       } catch (error) {
-        console.log(error.response);
         setError(error?.response?.data?.message);
       }
     };
     handllerNotifi();
-  },[]);
+  }, []);
 
   return (
-    <div className="bg-gray-200 min-h-screen relative top-20">
+    <div className="bg-gray-200 min-h-screen max-w-2xl mx-auto relative top-20">
       {notification.length > 0 ? (
         notification.map((items, key) => (
           <div key={key} className="  bg-gray-400 mb-1">

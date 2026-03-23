@@ -27,38 +27,43 @@ const Navbar = () => {
 
   return (
     <>
-      <div className=" w-full z-999  bg-white h-auto fixed  ">
-        <header className="grid grid-cols-2 justify-between pt-2 ">
-          <h2
-            onClick={() => navigate("/home")}
-            className="pl-2 text-3xl font-extrabold text-blue-700  "
-            style={{ fontFamily: "SN Pro" }}
-          >
-            facebook
-          </h2>
-          <div className="justify-items-end-safe ">
-            <HiDotsVertical className="text-3xl pt-2" onClick={handleLogout} />
-          </div>
-        </header>
+      <div className="z-999 w-full bg-white h-auto fixed  ">
+        <div className="max-w-2xl mx-auto  ">
+          <header className="grid grid-cols-2 justify-between pt-2 ">
+            <h2
+              onClick={() => navigate("/home")}
+              className="pl-2 text-3xl font-extrabold text-blue-700  "
+              style={{ fontFamily: "SN Pro" }}
+            >
+              facebook
+            </h2>
+            <div className="justify-items-end-safe ">
+              <HiDotsVertical
+                className="text-3xl pt-2"
+                onClick={handleLogout}
+              />
+            </div>
+          </header>
 
-        <nav
-          style={{ textAlign: "-webkit-center" }}
-          className="grid grid-cols-4 justify-center items-center p-2 text-black"
-        >
-          <NavLink to="/home" className={activeclass}>
-            <FaHome />
-          </NavLink>
-          <NavLink to="/friends" className={activeclass}>
-            <FaUserFriends />
-          </NavLink>
-          <NavLink to="/notification" className={activeclass}>
-            <IoNotifications />
-          </NavLink>
-          <NavLink to="/trending" className={activeclass}>
-            <RiSlideshow3Fill />{" "}
-          </NavLink>
-        </nav>
-        <hr />
+          <nav
+            style={{ textAlign: "-webkit-center" }}
+            className="grid grid-cols-4 justify-center items-center p-2 text-black"
+          >
+            <NavLink to="/home" className={activeclass}>
+              <FaHome />
+            </NavLink>
+            <NavLink to="/friends" className={activeclass}>
+              <FaUserFriends />
+            </NavLink>
+            <NavLink to="/notification" className={activeclass}>
+              <IoNotifications />
+            </NavLink>
+            <NavLink to="/trending" className={activeclass}>
+              <RiSlideshow3Fill />{" "}
+            </NavLink>
+          </nav>
+          <hr />
+        </div>
       </div>
 
       {/* Model Setting */}

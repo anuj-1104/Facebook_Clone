@@ -93,7 +93,7 @@ const Friends_Page = () => {
 
   return (
     <>
-      <div className="relative top-20 border bg-gray-300">
+      <div className="relative max-w-2xl mx-auto top-20  ">
         <div className="m-3 ">
           <input
             type="text"
@@ -104,7 +104,7 @@ const Friends_Page = () => {
             onChange={handlechange}
             id="searchbar"
             placeholder="search."
-            className="p-1 outline-0   duration-150  border-b-2 w-full "
+            className="p-2 outline-0 mt-2 text-2xl capitalize duration-150  border-b-2 w-full "
           />
         </div>
 
@@ -117,7 +117,7 @@ const Friends_Page = () => {
 
         {friendreq.length > 0 &&
           friendreq.map((item, index) => (
-            <div key={index} className="bg-gray-300 m-2  border ">
+            <div key={index} className="m-2   ">
               <div className="p-3  h-auto w-full flex gap-5">
                 <img
                   src={item.profile_image}
@@ -145,7 +145,7 @@ const Friends_Page = () => {
 
         {data.length > 0 ? (
           friendsdata.map((user, key) => (
-            <div key={key} className="bg-gray-200 m-2 border-b-0 border">
+            <div key={key} className="backdrop-blur-md  m-2  border rounded">
               <div className="p-3  h-auto w-full flex gap-5">
                 <img
                   src={user.profile_image}
@@ -153,16 +153,16 @@ const Friends_Page = () => {
                   className="w-10 h-10 rounded-full"
                 />
 
-                <p>{user.name}</p>
+                <p className="capitalize font-medium">{user.name}</p>
               </div>
               <div className="grid grid-cols-2 gap-3 p-2">
                 <button
                   onClick={() => handllerfriends(user._id)}
-                  className="text-white bg-blue-600 p-2 hover:bg-blue-700  font-medium duration-300 "
+                  className="text-white bg-blue-600 p-2 hover:bg-blue-700  font-medium duration-200 "
                 >
                   Add friend
                 </button>
-                <button className="text-white bg-gray-400 hover:bg-gray-500 duration-300 p-2 font-medium ">
+                <button className="text-white bg-gray-400 hover:bg-gray-500 duration-200 p-2 font-medium ">
                   Remove
                 </button>
               </div>

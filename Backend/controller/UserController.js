@@ -2,9 +2,11 @@ import { User } from "../model/User_Model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Post } from "../model/Post_Model.js";
-import axios from "axios";
-import FormData from "form-data";
+import { upload_image } from "../middleware/UploadFile.js";
 import multer from "multer";
+
+const storage = multer.memoryStorage();
+export const upload = multer({ storage });
 
 export const userLogin = async (req, res) => {
   try {
@@ -44,8 +46,6 @@ export const userLogin = async (req, res) => {
     res.status(500).json({ message: `Internal Server Error:${error} ` });
   }
 };
-const storage = multer.memoryStorage();
-export const upload = multer({ storage });
 
 export const userRegistration = async (req, res) => {
   try {
@@ -54,22 +54,7 @@ export const userRegistration = async (req, res) => {
 
     if (!file) return res.status(400).json({ message: "Image Required" });
 
-    // Convert file buffer to base64
-    const base64Image = file.buffer.toString("base64");
-
-    const formdata = new FormData();
-    formdata.append("image", base64Image);
-
-    // ImgBB API requires key in query parameter
-    const bbImageApiKey = process.env.BB_IMAGE_API ?? "";
-
-    const bbResponse = await axios.post(
-      `https://api.imgbb.com/1/upload?key=${bbImageApiKey}`,
-      formdata,
-      { headers: formdata.getHeaders() },
-    );
-
-    const imageUrl = bbResponse.data.data.url;
+    const imageUrl = await upload_image(file);
 
     // Check if user exists
     const existingUser = await User.findOne({ email: data.email });
@@ -110,7 +95,7 @@ export const CurrentUser = async (req, res) => {
     }
     res.status(200).json({ message: "Current Login User .", data: user_Data });
   } catch (error) {
-    console.log(error);
+    res.status(500).josn({ message: "Internal server error !" });
   }
 };
 
@@ -149,20 +134,6 @@ export const FrogetPassword = async (req, res) => {
   }
 };
 
-// export const  userFind = async (req, res) => {
-//   try {
-//     const { _id } = req.body;
-//     const response = await User.findById(_id).select("-password");
-//     if (!response) {
-//       return res.status(404).json({ message: "User Not Found" });
-//     }
-
-//     res.status(200).json({ message: "Login User Data..", data: response });
-//   } catch (error) {
-//     return res.status(500).json({ messsage: "Internal Server Error " });
-//   }
-// };
-
 export const userFind = async (req, res) => {
   try {
     const { ids } = req.body;
@@ -180,8 +151,6 @@ export const userFind = async (req, res) => {
     const users = await User.find({
       _id: { $in: uniqueIds },
     }).select("-password");
-
-    console.log(users);
 
     if (!users.length) {
       return res.status(404).json({ message: "No users found" });
@@ -212,8 +181,6 @@ export const User_lists = async (req, res) => {
     const data = allusers.filter(
       (item) => item._id.toString() != user.toString(),
     );
-
-    console.log(data);
 
     res.status(200).json({ data: data });
   } catch (error) {
@@ -390,10 +357,43 @@ export const UserfriendsController = async (req, res) => {
     }
 
     const allfriends = user?.friends;
-    // const filterfriends=allfriends
 
     res.status(200).json({ message: "All Friends", friends: allfriends });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const PostImage = async (req, res) => {
+  try {
+    const data = req.body;
+    const file = req.file;
+    const userId = req.user;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User Not Found!" });
+    }
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+    const url = await upload_image(file);
+
+    const post = new Post({
+      user_id: user._id,
+      user_name: user.name,
+      profile_image: user.profile_image,
+      image_url: url,
+      description: data.description,
+      like: 0,
+      comment: "",
+    });
+
+    const response = await post.save();
+    res
+      .status(200)
+      .json({ message: "post uploded Successfully .", data: response });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error !" });
   }
 };

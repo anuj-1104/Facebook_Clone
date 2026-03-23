@@ -11,6 +11,7 @@ const UserPost = () => {
   const { token, user, handlerlikes } = useAppcontext();
   const [open, setOpen] = useState(null);
   const [active, setActive] = useState(null);
+  const [like, setLike] = useState(null);
   const [error, setError] = useState("");
   const [friends, setFriends] = useState([]);
   const [commentmodel, setCommentModel] = useState(null);
@@ -43,82 +44,117 @@ const UserPost = () => {
     handleFriends();
   }, [active]);
 
-  const handlelike = (id) => {
+  const handlelike = async (id) => {
     if (!id) {
       return;
     }
-    if (handlerlikes(id)) {
+    if (await handlerlikes(id)) {
       setActive(id);
+
+      setLike(id);
+      setTimeout(() => {
+        setLike(null);
+      }, 2000);
     } else {
       setActive(null);
     }
   };
 
-  //handle this page 24-2
+  // Determine grid layout based on number of images
+  const getImageGridClass = (imageCount) => {
+    if (imageCount === 1) return "grid-cols-1";
+    if (imageCount === 2) return "grid-cols-2";
+    if (imageCount === 3) return "grid-cols-3";
+    if (imageCount === 4) return "grid-cols-2";
+    return "grid-cols-2 sm:grid-cols-3";
+  };
+
   return (
-    <div className=" relative z-50 top-12 ">
-      <div className="">
+    <div className="relative  z-1000  px-2 sm:px-4 md:px-0 max-w-2xl mx-auto">
+      <div className="space-y-4">
         {friends.length > 0 ? (
           friends.map((items) => (
-            <div key={items._id} className=" bg-white w-auto p-2 over  mb-3">
-              <div className=" flex flex-col-2 justify-between   bg-white  ">
-                <div className="flex gap-5 text-center">
+            <div
+              key={items._id}
+              className="bg-white rounded-lg shadow-md p-3 sm:p-4 mb-4 border border-gray-200"
+            >
+              <div className="flex justify-between items-center bg-white mb-3">
+                <div className="flex items-center gap-3">
                   <img
-                    className="w-10 h-10 rounded-full"
-                    src={`http://localhost:8080/${items.profile_image}`}
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
+                    src={items.profile_image}
                     alt={items.user_name}
                   />
                   <p
                     style={{ fontFamily: "SN Pro" }}
-                    className="font-bold align-middle relative top-2  text-center"
+                    className="font-bold text-sm sm:text-base capitalize"
                   >
                     {items.user_name}
                   </p>
                 </div>
-                <button
-                  onClick={() =>
-                    setOpen((prev) => (prev === items._id ? null : items._id))
-                  }
-                >
-                  <HiDotsHorizontal className=" text-2xl " />
-                </button>
-                {open === items._id && (
-                  <div className="absolute z-50  rounded-2xl p-2  bg-white h-auto outline-1 right-0 w-36  mt-6 m-2 ">
-                    <p
-                      className="text-red-400  font-normal text-start"
-                      onClick={() => [alert(items.user_name), setOpen(null)]} //only dummy purpose
-                    >
-                      Block User
-                    </p>
-                    <p className="font-normal">report</p>
-                  </div>
-                )}
+                <div className="relative">
+                  <button
+                    onClick={() =>
+                      setOpen((prev) => (prev === items._id ? null : items._id))
+                    }
+                    className="p-1 hover:bg-gray-100 rounded-full"
+                  >
+                    <HiDotsHorizontal className="text-xl sm:text-2xl" />
+                  </button>
+                  {open === items._id && (
+                    <div className="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                      <button
+                        className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100 rounded-t-lg"
+                        onClick={() => {
+                          alert(items.user_name);
+                          setOpen(null);
+                        }}
+                      >
+                        Block User
+                      </button>
+                      <button className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-b-lg">
+                        Report
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-              {items.description}
-              <div className="grid relative grid-cols-2 gap-1  outline-0 rounded  h-auto ">
+
+              <p className="font-medium text-sm sm:text-base mb-3">
+                {items.description}
+              </p>
+
+              <div
+                onDoubleClick={() => handlelike(items._id)}
+                className={`grid ${getImageGridClass(items.image_url.length)} rounded-lg overflow-hidden`}
+              >
                 {items.image_url.map((image, index) => (
                   <img
-                    className="rounded"
+                    className="w-full h-35 sm:h-35 md:h-100 object-cover"
                     key={index}
-                    src={`http://localhost:8080/${image}`}
+                    src={image}
                     alt={image}
                   />
                 ))}
+
+                {like == items._id && (
+                  <div className="absolute items-center justify-center pointer-events-none ">
+                    <AiFillLike className="relative text-blue-600 text-6xl sm:text-7xl md:text-8xl animate-bounce z-10" />
+                  </div>
+                )}
               </div>
 
-              <br />
-              <div
-                style={{ textAlign: "-webkit-center" }}
-                className="grid grid-cols-3 pt-3 pb-3  justify-items-center-safe   bg-white"
-              >
-                <button className="flex" onClick={() => handlelike(items._id)}>
-                  {/* Items.likedbyuser manage */}
+              <div className="flex justify-between items-center pt-3 pb-2 mt-2 border-t border-gray-100">
+                <button
+                  className="flex items-center gap-1 sm:gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
+                  onClick={() => handlelike(items._id)}
+                >
                   {active === items._id ? (
-                    <AiFillLike className="text-2xl text-blue-600" />
+                    <AiFillLike className="text-xl sm:text-2xl text-blue-600" />
                   ) : (
-                    <AiOutlineLike className="text-2xl " />
+                    <AiOutlineLike className="text-xl sm:text-2xl" />
                   )}
-                  {items.like}
+                  <span className="text-sm sm:text-base">{items.like}</span>
                 </button>
 
                 <div className="relative">
@@ -128,23 +164,25 @@ const UserPost = () => {
                         prev === items._id ? null : items._id,
                       )
                     }
-                    className="justify-items-center-safe flex gap-1"
+                    className="flex items-center gap-1 sm:gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
                   >
-                    <FaRegComment className="text-2xl" />
-                    <p>{items.comment.length}</p>
+                    <FaRegComment className="text-xl sm:text-2xl" />
+                    <span className="text-sm sm:text-base">
+                      {items.comment.length}
+                    </span>
                   </button>
 
-                  {commentmodel === items._id ? (
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-50 w-100">
+                  {commentmodel === items._id && (
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-50 w-80 sm:w-96">
                       <div className="bg-white rounded-lg shadow-xl p-4 border border-gray-200">
                         <div className="max-h-60 overflow-y-auto mb-4">
                           {items.comment && items.comment.length > 0 ? (
                             items.comment.map((c, index) => (
                               <div
                                 key={index}
-                                className="mb-2 p-2  bg-gray-200 w-50 rounded-md"
+                                className="mb-2 p-2 bg-gray-100 rounded-md"
                               >
-                                <p className="text-sm w-full text-start">{c}</p>
+                                <p className="text-sm text-left">{c}</p>
                               </div>
                             ))
                           ) : (
@@ -161,7 +199,7 @@ const UserPost = () => {
                             autoFocus
                             id="comment"
                             placeholder="Add a comment..."
-                            className="border border-gray-300 flex-1 p-2 rounded-full outline-0 focus:ring-2 focus:ring-blue-400 text-sm"
+                            className="border border-gray-300 flex-1 p-2 rounded-full outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                           />
                           <button className="bg-blue-500 text-white px-4 py-1.5 rounded-full hover:bg-blue-600 transition-colors text-sm font-medium">
                             Post
@@ -169,21 +207,21 @@ const UserPost = () => {
                         </div>
                       </div>
                     </div>
-                  ) : (
-                    ""
                   )}
                 </div>
-                <button className="flex justify-items-center-safe">
-                  <RiShareForwardLine className="text-2xl" />
-                  <p>share</p>
+
+                <button className="flex items-center gap-1 sm:gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors">
+                  <RiShareForwardLine className="text-xl sm:text-2xl" />
+                  <span className="text-sm sm:text-base">Share</span>
                 </button>
               </div>
-              <hr />
             </div>
           ))
         ) : (
-          <div className="relative justify-items-center-safe m-4">
-            <p className="text-2xl font-medium animate-pulse">{error}</p>
+          <div className="flex justify-center items-center h-64">
+            <p className="text-xl sm:text-2xl font-medium text-gray-500 animate-pulse">
+              {error || "No posts available"}
+            </p>
           </div>
         )}
       </div>

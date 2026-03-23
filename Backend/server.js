@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import UserRoutes from "./Routes/UserRoutes.js";
 import FriendsRoutes from "./Routes/FriendRoutes.js";
+import postRoute from "./Routes/PostRoute.js";
 
 dotenv.config();
 
@@ -36,7 +37,7 @@ const connectDB = async () => {
   }
 };
 
-app.use(async (req, res, next) => {
+app.use(async (_, res, next) => {
   try {
     await connectDB();
     next();
@@ -59,6 +60,7 @@ app.get("/", (_, res) => {
 //all Routes others
 app.use("/api/user", UserRoutes);
 app.use("/api/request", FriendsRoutes);
+app.use("/api/post", postRoute);
 
 app.listen(port, () => {
   console.log(`server run on http://localhost:${port}`);

@@ -14,9 +14,9 @@ import {
   ProfileController,
   CurrentUser,
   UserfriendsController,
+  PostImage,
 } from "../controller/UserController.js";
 import UserAuth from "../middleware/UserAuth.js";
-// import { upload } from "../middleware/UploadFile.js";
 import { upload } from "../controller/UserController.js";
 
 const user_Router = Router();
@@ -28,7 +28,7 @@ user_Router.post(
   userRegistration,
 );
 
-user_Router.get("/curr/user",UserAuth, CurrentUser);
+user_Router.get("/curr/user", UserAuth, CurrentUser);
 
 user_Router.post("/login/user", userFind);
 user_Router.patch("/forget_password", FrogetPassword);
@@ -44,6 +44,13 @@ user_Router.patch("/edit/profile", UserAuth, ProfileController);
 //public access
 user_Router.patch("/like/id", UserAuth, update_like);
 user_Router.patch("/comment/id", UserAuth, add_Comment);
+
+user_Router.post(
+  "/post/image",
+  UserAuth,
+  upload.single("post_image"),
+  PostImage,
+);
 
 export default user_Router;
 // /api/user/edit/profile
