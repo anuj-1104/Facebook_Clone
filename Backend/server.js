@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //middleware origin websites
 const corsOption = {
-  origin: "*",
+  origin: "https://facebook-clone-delta-lovat.vercel.app/",
   optionsSuccessStatus: true,
 };
 app.use(cors(corsOption));
