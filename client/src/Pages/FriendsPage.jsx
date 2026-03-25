@@ -8,30 +8,31 @@ const Friends_Page = () => {
   const [data, setData] = useState([]);
   const [request, setRequest] = useState("");
   const [friendreq, setFriendReq] = useState([]);
+  const [friendId, setFriendId] = useState(null);
 
-  const { token, friendsrequest, user } = useAppcontext();
+  const { token, user } = useAppcontext();
+  const User = user;
 
-  useEffect(() => {
-    const findFriendsRequest = async () => {
-      try {
-        const response = await axios.get("/api/request/friend/notification");
-        if (response.status === 200) {
-          setFriendReq(response.data);
-        }
-      } catch (error) {
-        console.log(error);
+  const findFriendsRequest = async () => {
+    try {
+      const response = await axios.get("/api/request/friend/notification", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 200) {
+        setFriendReq(response.data.data);
+        const friend_Id = response.data.request.filter(
+          (id) => id.receiver === User.id,
+        );
+
+        setFriendId(friend_Id[0]._id);
       }
-    };
-    findFriendsRequest();
-  }, []);
-
-  useEffect(() => {
-    const result = friendsrequest.filter((pre) => pre._id !== user._id);
-
-    if (result) {
-      setFriendReq(result);
+    } catch (error) {
+      console.log(error);
     }
-  }, []);
+  };
+
 
   const handlechange = (e) => {
     const value = e.target.value.toLowerCase();
@@ -43,7 +44,6 @@ const Friends_Page = () => {
 
     setFriendsData(result);
   };
-
   useEffect(() => {
     const handlerfriends = async () => {
       try {
@@ -60,16 +60,19 @@ const Friends_Page = () => {
         console.log(error || response.error);
       }
     };
-
     handlerfriends();
   }, []);
+
+  useEffect(() => {
+    findFriendsRequest();
+  }, [user]);
 
   const handllerfriends = async (request) => {
     try {
       const response = await axios.post(
         "/api/request/friend/request",
         {
-          request: request,
+          receiver: request,
         },
         {
           headers: {
@@ -79,6 +82,21 @@ const Friends_Page = () => {
       );
       if (response.status === 200) {
         setRequest(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  
+  const conformRequest = async () => {
+    try {
+      const response = await axios.post("/api/request/friend/confirm", {
+        id: friendId,
+      });
+
+      if (response.status === 200) {
+        console.log(response);
+        findFriendsRequest();
       }
     } catch (error) {
       console.log(error);
@@ -108,12 +126,15 @@ const Friends_Page = () => {
           />
         </div>
 
-        <div
-          className="font-bold text-2xl m-2 "
-          style={{ fontFamily: " SN Pro" }}
-        >
-          <h3>New Request</h3>
-        </div>
+        {friendreq.length > 0 && (
+          <div
+            className="font-bold text-2xl m-2 "
+            style={{ fontFamily: " SN Pro" }}
+          >
+            <h3>New Request</h3>
+            <hr />
+          </div>
+        )}
 
         {friendreq.length > 0 &&
           friendreq.map((item, index) => (
@@ -129,7 +150,7 @@ const Friends_Page = () => {
               </div>
               <div className="grid grid-cols-2 gap-3 p-2">
                 <button
-                  onClick={() => handllerfriends(item._id)}
+                  onClick={conformRequest}
                   className="text-white bg-blue-600 p-2 hover:bg-blue-700  font-medium duration-300 "
                 >
                   Confirm

@@ -6,8 +6,6 @@ export const friendsRequest = async (req, res) => {
     const { receiver } = req.body;
     const sender = req.user._id;
 
-    console.log(receiver, sender);
-
     // Check if request already exists
     const existing = await Friends.findOne({
       $or: [
@@ -15,7 +13,6 @@ export const friendsRequest = async (req, res) => {
         { sender: receiver, receiver: sender },
       ],
     });
-
     if (existing) {
       return res.status(400).json({ message: "Request already exists" });
     }
@@ -31,7 +28,6 @@ export const friendsRequest = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-
     res.status(200).json({
       message: "Friend request sent successfully",
       data: friendRequest,
@@ -44,28 +40,29 @@ export const friendsRequest = async (req, res) => {
 
 export const friNotification = async (req, res) => {
   try {
-    const friends = await Friends.find();
+    const userId = req.user._id;
+    const friends = await Friends.find({
+      receiver: userId,
+      status: { $ne: "accepted" },
+    });
 
-    const senderIds = friends
-      .filter((data) => data.status !== "friends")
-      .map((f) => f.sender);
+    const senderIds = [...new Set(friends.map((f) => f.sender))]; //removed duplicate
 
-    if (!senderIds) {
+    if (senderIds.length === 0) {
       return res.status(404).json({ message: "friend request not found" });
     }
 
-    const response = await User.find({
+    const users = await User.find({
       _id: { $in: senderIds },
     }).select("-password");
 
-    if (response.length <= 0) {
-      return res.status(404).json({ message: "Notification not found " });
+    if (users.length === 0) {
+      return res.status(404).json({ message: "Notification not found" });
     }
-    console.log(response);
 
-    res.status(200).json(response);
+    res.status(200).json({ data: users, request: friends });
   } catch (error) {
-    res.status(500).json({ message: `error: ${error}` });
+    res.status(500).json({ message: `error: ${error.message}` });
   }
 };
 
@@ -80,18 +77,18 @@ export const requestconform = async (req, res) => {
     }
 
     const update_req = await Friends.findOneAndUpdate(user._id, {
-      status: "friends",
+      status: "accepted",
     });
 
     await User.findByIdAndUpdate(
-      user.reciver,
+      user.receiver,
       { $push: { friends: user.sender } },
       { returnDocument: "after" },
     );
 
     const add_friends = await User.findByIdAndUpdate(
       user.sender,
-      { $push: { friends: user.reciver } },
+      { $push: { friends: user.receiver } },
       { returnDocument: "after" },
     );
 

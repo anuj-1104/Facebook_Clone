@@ -2,10 +2,21 @@ import mongoose from "mongoose";
 
 const friends_model = new mongoose.Schema(
   {
-    sender: { type: String },
-    request: { type: String },
-    reciver: { type: String },
-    status: { type: String, default: "unfriend" },
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    receiver: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    },
   },
   { timestamps: true },
 );

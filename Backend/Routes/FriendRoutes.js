@@ -11,7 +11,7 @@ const FriendsRoutes = Router();
 
 FriendsRoutes.get("/friend/allrequest", requestController);
 FriendsRoutes.post("/friend/request", userAuthMiddleware, friendsRequest);
-FriendsRoutes.get("/friend/notification", friNotification);
-FriendsRoutes.post("/friend/confirmreq", requestconform);
+FriendsRoutes.get("/friend/notification", userAuthMiddleware, friNotification);
+FriendsRoutes.post("/friend/confirm", requestconform);
 
 export default FriendsRoutes;

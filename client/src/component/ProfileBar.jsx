@@ -18,7 +18,7 @@ const ProfileBar = () => {
   });
 
   const { user, token } = useAppcontext();
-  const User = typeof user === "string" ? JSON.parse(user) : user;
+  const User = user;
 
   const fileInputRef = useRef(null);
 
@@ -239,15 +239,18 @@ const ProfileBar = () => {
                   }`}
                 >
                   {preview.map((img, index) => (
-                    <div key={index} className="relative group">
+                    <div
+                      key={index}
+                      className="relative group justify-items-center-safe"
+                    >
                       <img
                         src={img}
                         alt={`Preview ${index + 1}`}
-                        className="w-full h-48 sm:h-64 object-cover rounded-lg"
+                        className="w-40 h-40 sm:h-40 object-fill rounded-lg"
                       />
                       <button
                         onClick={() => removeImage(index)}
-                        className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-10 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <LuX className="text-lg" />
                       </button>

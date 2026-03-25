@@ -1,15 +1,13 @@
 import multer from "multer";
 import axios from "axios";
 import FormData from "form-data";
+import dotenv from "dotenv";
 
-// ✅ Use memory storage (IMPORTANT for buffer)
+dotenv.config();
+
 const storage = multer.memoryStorage();
-
 export const upload = multer({ storage });
 
-/* ────────────────────────────────────────────────
-   Upload Single Image to imgbb
-──────────────────────────────────────────────── */
 export const upload_image = async (file) => {
   try {
     const bbImageApiKey = process.env.BB_IMAGE_API;
@@ -34,9 +32,6 @@ export const upload_image = async (file) => {
   }
 };
 
-/* ────────────────────────────────────────────────
-   Upload Multiple Images to imgbb
-──────────────────────────────────────────────── */
 export const upload_images = async (files) => {
   try {
     const bbImageApiKey = process.env.BB_IMAGE_API;
@@ -60,8 +55,6 @@ export const upload_images = async (files) => {
 
     const urls = await Promise.all(uploadPromises);
 
-    console.log("Uploaded URLs:", urls);
-
     return urls;
   } catch (error) {
     console.log(
@@ -71,3 +64,13 @@ export const upload_images = async (files) => {
     throw error;
   }
 };
+
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
+
+export default cloudinary;

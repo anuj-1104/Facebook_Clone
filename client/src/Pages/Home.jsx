@@ -19,7 +19,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [submittingComment, setSubmittingComment] = useState(false);
 
-  const { handlerlikes } = useAppcontext();
+  const { handlerlikes, getImageGridClass } = useAppcontext();
   const commentScrollRef = useRef(null);
 
   // Fetch posts from API
@@ -40,7 +40,7 @@ const Home = () => {
   // Initial fetch
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts]);
+  }, []);
 
   // Reset error when search changes
   useEffect(() => {
@@ -103,22 +103,13 @@ const Home = () => {
       setLike(null);
     }, 2000);
 
-    // Update the like count in state
     setFriendsPost((prevPosts) =>
       prevPosts.map((post) =>
         post._id === id
-          ? { ...post, like: liked ? post.like + 1 : post.like - 1 }
+          ? { ...post, like: liked ? post.like + 1 : post.like }
           : post,
       ),
     );
-  };
-
-  // Determine grid layout based on number of images
-  const getImageGridClass = (imageCount) => {
-    if (imageCount === 1) return "grid-cols-1";
-    if (imageCount === 2) return "grid-cols-2";
-    if (imageCount === 3) return "grid-cols-3";
-    return "grid-cols-2";
   };
 
   return (
@@ -187,20 +178,20 @@ const Home = () => {
               {items?.image_url && items.image_url.length > 0 && (
                 <div
                   onDoubleClick={() => handlelike(items._id)}
-                  className={`grid ${getImageGridClass(items.image_url.length)} gap-1 p-2`}
+                  className={`grid ${getImageGridClass(items.image_url.length)} gap-1 p-2 justify-items-center-safe`}
                 >
                   {items.image_url.map((image, index) => (
                     <img
                       key={index}
-                      className="w-2xl h-40 sm:h-60 object-cover rounded"
+                      className="w-full h-full  object-fill rounded"
                       src={image}
                       alt={`Post image ${index + 1}`}
                     />
                   ))}
 
                   {like == items._id && (
-                    <div className="absolute items-center justify-center pointer-events-none ">
-                      <AiFillLike className="relative text-blue-600 text-6xl sm:text-7xl md:text-8xl animate-bounce z-10" />
+                    <div className="absolute items-center justify-center  pointer-events-none ">
+                      <AiFillLike className="relative text-blue-600 top-15 text-6xl sm:text-7xl md:text-8xl animate-bounce z-10" />
                     </div>
                   )}
                 </div>

@@ -8,14 +8,13 @@ import { HiDotsHorizontal } from "react-icons/hi";
 import { useAppcontext } from "../contaxt/Appcontext";
 
 const UserPost = () => {
-  const { token, user, handlerlikes } = useAppcontext();
+  const { token, user, handlerlikes, getImageGridClass } = useAppcontext();
   const [open, setOpen] = useState(null);
   const [active, setActive] = useState(null);
   const [like, setLike] = useState(null);
   const [error, setError] = useState("");
   const [friends, setFriends] = useState([]);
   const [commentmodel, setCommentModel] = useState(null);
-  const user_data = JSON.parse(user);
 
   useEffect(() => {
     const handleFriends = async () => {
@@ -23,7 +22,7 @@ const UserPost = () => {
         const response = await axios.post(
           "/api/user/allpost",
           {
-            user_id: user_data.id,
+            user_id: user.id,
           },
           {
             headers: {
@@ -48,25 +47,22 @@ const UserPost = () => {
     if (!id) {
       return;
     }
+
+    if (like == id) {
+      return;
+    }
+
     if (await handlerlikes(id)) {
       setActive(id);
 
       setLike(id);
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setLike(null);
       }, 2000);
+      await timer;
     } else {
       setActive(null);
     }
-  };
-
-  // Determine grid layout based on number of images
-  const getImageGridClass = (imageCount) => {
-    if (imageCount === 1) return "grid-cols-1";
-    if (imageCount === 2) return "grid-cols-2";
-    if (imageCount === 3) return "grid-cols-3";
-    if (imageCount === 4) return "grid-cols-2";
-    return "grid-cols-2 sm:grid-cols-3";
   };
 
   return (
@@ -119,33 +115,37 @@ const UserPost = () => {
                   )}
                 </div>
               </div>
-
-              <p className="font-medium text-sm sm:text-base mb-3">
-                {items.description}
-              </p>
+              <div>
+                <p className="font-medium text-sm sm:text-base mb-3">
+                  {items.description}
+                </p>
+              </div>
 
               <div
                 onDoubleClick={() => handlelike(items._id)}
                 className={`grid ${getImageGridClass(items.image_url.length)} rounded-lg overflow-hidden`}
               >
                 {items.image_url.map((image, index) => (
-                  <img
-                    className="w-full h-35 sm:h-35 md:h-100 object-cover"
-                    key={index}
-                    src={image}
-                    alt={image}
-                  />
+                  <div key={index} className="justify-items-center-safe">
+                    <img
+                      className="w-full h-auto object-fill "
+                      key={index}
+                      src={image}
+                      alt={image}
+                    />
+                  </div>
                 ))}
 
                 {like == items._id && (
-                  <div className="absolute items-center justify-center pointer-events-none ">
-                    <AiFillLike className="relative text-blue-600 text-6xl sm:text-7xl md:text-8xl animate-bounce z-10" />
+                  <div className="absolute items-center justify-center  pointer-events-none ">
+                    <AiFillLike className="relative text-blue-600 top-15 left-30 text-6xl sm:text-7xl md:text-8xl animate-bounce z-10" />
                   </div>
                 )}
               </div>
 
               <div className="flex justify-between items-center pt-3 pb-2 mt-2 border-t border-gray-100">
                 <button
+                  title="Like"
                   className="flex items-center gap-1 sm:gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
                   onClick={() => handlelike(items._id)}
                 >
@@ -159,6 +159,7 @@ const UserPost = () => {
 
                 <div className="relative">
                   <button
+                    title="Comment"
                     onClick={() =>
                       setCommentModel((prev) =>
                         prev === items._id ? null : items._id,
@@ -210,7 +211,10 @@ const UserPost = () => {
                   )}
                 </div>
 
-                <button className="flex items-center gap-1 sm:gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors">
+                <button
+                  title="Share"
+                  className="flex items-center gap-1 sm:gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
+                >
                   <RiShareForwardLine className="text-xl sm:text-2xl" />
                   <span className="text-sm sm:text-base">Share</span>
                 </button>

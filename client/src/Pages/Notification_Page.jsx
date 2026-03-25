@@ -1,28 +1,37 @@
 import React, { useEffect, useState } from "react";
 import axios from "../api/axios";
+import { useAppcontext } from "../contaxt/Appcontext";
 
 const Notification_Page = () => {
-  const [notification, setNotification] = useState({});
+  const [notification, setNotification] = useState([]);
   const [error, setError] = useState("");
+  const { token } = useAppcontext();
+
+  const handllerNotifi = async () => {
+    try {
+      const response = await axios.get("/api/request/friend/notification", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        setNotification(response.data);
+      }
+    } catch (error) {
+      console.error(error.response.data.message);
+      setError(error?.response?.data?.message);
+    }
+  };
 
   useEffect(() => {
-    const handllerNotifi = async () => {
-      try {
-        const response = await axios.get("/api/request/friend/notification");
-        console.log(response);
-        if (response.status === 200) {
-          console.log(response);
-          setNotification(response.data);
-        }
-      } catch (error) {
-        setError(error?.response?.data?.message);
-      }
-    };
-    handllerNotifi();
-  }, []);
+    if (token) {
+      handllerNotifi();
+    }
+  }, [token]);
 
   return (
-    <div className="bg-gray-200 min-h-screen max-w-2xl mx-auto relative top-20">
+    <div className="bg-black/10 min-h-screen max-w-2xl mx-auto relative top-20">
       {notification.length > 0 ? (
         notification.map((items, key) => (
           <div key={key} className="  bg-gray-400 mb-1">

@@ -20,7 +20,6 @@ const ProfilePage = () => {
     location: "",
     information: "",
   });
-
   const [formdata, setFormdata] = useState(user);
 
   const navigate = useNavigate();
@@ -76,6 +75,8 @@ const ProfilePage = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
+        console.log(res);
+
         if (res.status === 200) {
           const updatedData = res.data.data.personalDetail;
           localStorage.setItem("_user_bio_", JSON.stringify(updatedData));
@@ -88,6 +89,8 @@ const ProfilePage = () => {
 
     handleUser();
   }, []);
+
+  console.log(localStorage.getItem("_user_bio_"));
 
   // Edit button animation
   const handleEdit = () => {

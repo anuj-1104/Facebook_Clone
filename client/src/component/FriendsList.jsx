@@ -10,8 +10,7 @@ const FriendsList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const parsedUser = typeof user === "string" ? JSON.parse(user) : user;
-  const _id = parsedUser?.id;
+  const _id = user?.id;
 
   useEffect(() => {
     const handleFriends = async () => {

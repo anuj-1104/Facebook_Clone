@@ -79,14 +79,14 @@ export const userRegistration = async (req, res) => {
       .status(200)
       .json({ message: "User registered successfully", user: user_data });
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const CurrentUser = async (req, res) => {
   try {
-    const user_id = req.user;
+    const user_id = req.user._id;
 
     const user_Data = await User.findById({ _id: user_id }).select("-password");
 
@@ -95,7 +95,7 @@ export const CurrentUser = async (req, res) => {
     }
     res.status(200).json({ message: "Current Login User .", data: user_Data });
   } catch (error) {
-    res.status(500).josn({ message: "Internal server error !" });
+    res.status(500).json({ message: "Internal server error !" });
   }
 };
 
@@ -161,7 +161,7 @@ export const userFind = async (req, res) => {
       data: users,
     });
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return res.status(500).json({
       message: "Internal Server Error",
     });
@@ -170,19 +170,26 @@ export const userFind = async (req, res) => {
 
 export const User_lists = async (req, res) => {
   try {
-    const user = req.user;
+    const userId = req.user;
+
+    const user = await User.findById(userId).select("-password");
 
     const allusers = await User.find().select("-password");
     if (!allusers) {
       return res.status(404).json({ message: "users not found" });
     }
 
-    //can not response user login
+    //retrive all but filtering current login user
     const data = allusers.filter(
-      (item) => item._id.toString() != user.toString(),
+      (item) => item._id.toString() !== user._id.toString(),
     );
 
-    res.status(200).json({ data: data });
+    const filteredData = data.filter(
+      (item) =>
+        !user.friends.map((f) => f.toString()).includes(item._id.toString()),
+    );
+
+    res.status(200).json({ data: filteredData });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error " });
   }
@@ -347,13 +354,13 @@ export const UserfriendsController = async (req, res) => {
     const _id = req.user;
 
     if (!_id) {
-      return res.status(400).josn({ message: "User Not Found" });
+      return res.status(400).json({ message: "User Not Found" });
     }
 
     const user = await User.findById(_id).select("-password");
 
     if (!user) {
-      return res.staus(404).josn({ message: "User Not Found" });
+      return res.staus(404).json({ message: "User Not Found" });
     }
 
     const allfriends = user?.friends;
