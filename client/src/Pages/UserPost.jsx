@@ -6,6 +6,7 @@ import { FaRegComment } from "react-icons/fa";
 import { RiShareForwardLine } from "react-icons/ri";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { useAppcontext } from "../contaxt/Appcontext";
+import { useLocation } from "react-router-dom";
 
 const UserPost = () => {
   const { token, user, handlerlikes, getImageGridClass } = useAppcontext();
@@ -15,6 +16,8 @@ const UserPost = () => {
   const [error, setError] = useState("");
   const [friends, setFriends] = useState([]);
   const [commentmodel, setCommentModel] = useState(null);
+
+  const url = useLocation();
 
   useEffect(() => {
     const handleFriends = async () => {
@@ -48,10 +51,6 @@ const UserPost = () => {
       return;
     }
 
-    if (like == id) {
-      return;
-    }
-
     if (await handlerlikes(id)) {
       setActive(id);
 
@@ -67,14 +66,14 @@ const UserPost = () => {
 
   return (
     <div className="relative  z-1000  px-2 sm:px-4 md:px-0 max-w-2xl mx-auto">
-      <div className="space-y-4">
+      <div className="space-y-1">
         {friends.length > 0 ? (
           friends.map((items) => (
             <div
               key={items._id}
-              className="bg-white rounded-lg shadow-md p-3 sm:p-4 mb-4 border border-gray-200"
+              className="bg-white rounded-lg shadow-md p-3 sm:p-4  border border-gray-200"
             >
-              <div className="flex justify-between items-center bg-white mb-3">
+              <div className="flex justify-between items-center bg-white ">
                 <div className="flex items-center gap-3">
                   <img
                     className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
@@ -93,6 +92,7 @@ const UserPost = () => {
                     onClick={() =>
                       setOpen((prev) => (prev === items._id ? null : items._id))
                     }
+                    disabled={url.pathname === "/profile"}
                     className="p-1 hover:bg-gray-100 rounded-full"
                   >
                     <HiDotsHorizontal className="text-xl sm:text-2xl" />
@@ -116,7 +116,7 @@ const UserPost = () => {
                 </div>
               </div>
               <div>
-                <p className="font-medium text-sm sm:text-base mb-3">
+                <p className="font-medium text-sm sm:text-base mb-3 line-clamp-1 hover:line-clamp-none cursor-pointer">
                   {items.description}
                 </p>
               </div>

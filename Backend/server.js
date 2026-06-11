@@ -1,5 +1,5 @@
 import express from "express";
-import dotenv from "dotenv";
+import "dotenv/config";
 import cors from "cors";
 import database_connect from "./database/db.js";
 import { fileURLToPath } from "url";
@@ -7,8 +7,6 @@ import path from "path";
 import UserRoutes from "./Routes/UserRoutes.js";
 import FriendsRoutes from "./Routes/FriendRoutes.js";
 import postRoute from "./Routes/PostRoute.js";
-
-dotenv.config();
 
 const port = process.env.PORT;
 
@@ -63,5 +61,5 @@ app.use("/api/request", FriendsRoutes);
 app.use("/api/post", postRoute);
 
 app.listen(port, () => {
-  console.log(`server run on http://localhost:${port}`);
+  console.log(`\nserver run on http://localhost:${port}`);
 });

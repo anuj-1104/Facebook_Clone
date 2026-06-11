@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LuImages, LuX } from "react-icons/lu";
 import axios from "../api/axios";
 import { useAppcontext } from "../contaxt/Appcontext";
+import StorySection from "./StorySection";
 
 const ProfileBar = () => {
   const navigate = useNavigate();
@@ -144,8 +145,8 @@ const ProfileBar = () => {
 
   return (
     <>
-      <div className="sticky top-20 z-40 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 py-3">
+      <div className="sticky top-20 z-40 bg-white border-b max-w-2xl mx-auto border-gray-200 shadow-sm">
+        <div className="px-4 py-3">
           <div className="flex items-center gap-3">
             <img
               src={profile_image}
@@ -182,6 +183,7 @@ const ProfileBar = () => {
             />
           </div>
         </div>
+    
       </div>
 
       {/* Modal */}
@@ -258,6 +260,7 @@ const ProfileBar = () => {
                   ))}
                 </div>
               )}
+
             </div>
 
             {/* Footer */}

@@ -8,6 +8,7 @@ const post_model = new mongoose.Schema(
     image_url: [{ type: String, required: true }],
     description: { type: String },
     like: { type: Number, default: 0 },
+    likeduser: [{ type: String }],
     comment: [{ type: String }],
   },
   { timestamps: true },

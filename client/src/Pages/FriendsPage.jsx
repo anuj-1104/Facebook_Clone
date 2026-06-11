@@ -33,7 +33,6 @@ const Friends_Page = () => {
     }
   };
 
-
   const handlechange = (e) => {
     const value = e.target.value.toLowerCase();
     setSearch(value);
@@ -87,7 +86,7 @@ const Friends_Page = () => {
       console.log(error);
     }
   };
-  
+
   const conformRequest = async () => {
     try {
       const response = await axios.post("/api/request/friend/confirm", {
@@ -118,11 +117,10 @@ const Friends_Page = () => {
             name="search"
             value={search}
             spellCheck="false"
-            autoFocus
             onChange={handlechange}
             id="searchbar"
-            placeholder="search."
-            className="p-2 outline-0 mt-2 text-2xl capitalize duration-150  border-b-2 w-full "
+            placeholder="Username"
+            className="p-2 outline-0 mt-2 text-2xl capitalize duration-150  border-b-2 w-full rounded-b "
           />
         </div>
 

@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "../api/axios";
 import { FcGoogle } from "react-icons/fc";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { ImSpinner2 } from "react-icons/im";
 
 const LoginPage = () => {
   const [state, setState] = useState("signin");
+  const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
   const imageRef = useRef(null);
   const [error, setError] = useState("");
+
   const [formdata, setFormData] = useState({
     name: "",
     email: "",
@@ -44,16 +47,16 @@ const LoginPage = () => {
     setFile(e.target.files[0]);
     const [file] = profile_image.files; //access first image
     blash.src = URL.createObjectURL(file); //access a property of image id to src
-  }; //used a method to create a url and pass on the src property in image element render image
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     setError("");
 
     switch (state) {
       case "signin":
         try {
+          setLoading(true);
           const response = await axios.post("api/user/login", {
             email: formdata.email,
             password: formdata.password,
@@ -63,6 +66,7 @@ const LoginPage = () => {
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("profile_image", response.data.profile_image);
             localStorage.setItem("user", JSON.stringify(response.data.user));
+            setLoading(false);
             navigate("/home");
           }
         } catch (error) {
@@ -77,6 +81,7 @@ const LoginPage = () => {
         file_data.append("password", formdata.password);
 
         try {
+          setLoading(true);
           const response = await axios.post(
             "api/user/registration",
             file_data,
@@ -89,6 +94,7 @@ const LoginPage = () => {
 
           if (response.status === 200) {
             setState("signin");
+            setLoading(false);
           }
         } catch (error) {
           setError(error.response.data.message);
@@ -98,6 +104,7 @@ const LoginPage = () => {
         break;
       case "forget_password":
         try {
+          setLoading(true);
           const response = await axios.patch("/api/user/forget_password", {
             email: formdata.email,
             password: formdata.password,
@@ -107,6 +114,7 @@ const LoginPage = () => {
           if (response.status === 200) {
             console.log(response); //handle a backend not completed
             setState("signin");
+            setLoading(false);
           }
         } catch (error) {
           setError(error.response.data.message);
@@ -227,11 +235,17 @@ const LoginPage = () => {
                 type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md transition duration-200"
               >
-                {state === "signin"
-                  ? "Log In"
-                  : state === "signup"
-                    ? "Create Account"
-                    : "Reset Password"}
+                {state === "signin" ? (
+                  loading ? (
+                    <ImSpinner2 className="animate-spin  block mx-auto" />
+                  ) : (
+                    "Login In"
+                  )
+                ) : state === "signup" ? (
+                  "Create Account"
+                ) : (
+                  "Reset Password"
+                )}
               </button>
 
               {state === "signin" && (

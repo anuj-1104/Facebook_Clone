@@ -5,6 +5,7 @@ import { FaRegComment } from "react-icons/fa";
 import { RiShareForwardLine } from "react-icons/ri";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { IoIosSend } from "react-icons/io";
+import StorySection from "../component/StorySection";
 import axios from "../api/axios";
 import { useAppcontext } from "../contaxt/Appcontext";
 
@@ -15,12 +16,15 @@ const Home = () => {
   const [friendspost, setFriendsPost] = useState([]);
   const [error, setError] = useState(false);
   const [like, setLike] = useState(null);
+  const [likedusers, setLikedUsers] = useState([]);
   const [commentmodel, setCommentModel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [filterdata, setFilterData] = useState([]);
 
-  const { handlerlikes, getImageGridClass } = useAppcontext();
+  const { handlerlikes, getImageGridClass, user } = useAppcontext();
   const commentScrollRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   // Fetch posts from API
   const fetchPosts = useCallback(async () => {
@@ -40,7 +44,14 @@ const Home = () => {
   // Initial fetch
   useEffect(() => {
     fetchPosts();
-  }, []);
+
+    // Cleanup function to clear timeout on unmount
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [fetchPosts]);
 
   // Reset error when search changes
   useEffect(() => {
@@ -58,9 +69,9 @@ const Home = () => {
 
     try {
       setSubmittingComment(true);
-      const response = await axios.patch("/api/user/comment/id", {
+      // Fixed API endpoint to include the actual post ID
+      const response = await axios.patch(`/api/user/comment/${id}`, {
         comment,
-        id,
       });
 
       if (response.status === 200) {
@@ -93,28 +104,39 @@ const Home = () => {
 
   // Handle like/unlike
   const handlelike = async (id) => {
-    if (!id) return;
+    try {
+      const res = await handlerlikes(id);
 
-    const liked = await handlerlikes(id);
-    setActive(liked ? id : null);
-    setLike(id);
+      setFriendsPost((prev) =>
+        prev.map((post) => {
+          if (post._id === id) {
+            const alreadyLiked = post.likeduser.includes(user._id);
 
-    setTimeout(() => {
-      setLike(null);
-    }, 2000);
+            return {
+              ...post,
+              like: alreadyLiked ? post.like - 1 : post.like + 1,
+              likeduser: alreadyLiked
+                ? post.likeduser.filter((u) => u !== user._id)
+                : [...post.likeduser, user._id],
+            };
+          }
+          return post;
+        }),
+      );
 
-    setFriendsPost((prevPosts) =>
-      prevPosts.map((post) =>
-        post._id === id
-          ? { ...post, like: liked ? post.like + 1 : post.like }
-          : post,
-      ),
-    );
+      setLike(id);
+      // Use ref to store timeout reference to prevent memory leaks
+      timeoutRef.current = setTimeout(() => setLike(null), 2000);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <div className="select-none relative  mb-8">
+    <div className="select-none relative mb-8">
       <ProfileBar />
+
+      <StorySection />
 
       <div className="max-w-2xl mt-20 mx-auto">
         {loading ? (
@@ -178,20 +200,20 @@ const Home = () => {
               {items?.image_url && items.image_url.length > 0 && (
                 <div
                   onDoubleClick={() => handlelike(items._id)}
-                  className={`grid ${getImageGridClass(items.image_url.length)} gap-1 p-2 justify-items-center-safe`}
+                  className={`relative grid ${getImageGridClass(items.image_url.length)} gap-1 p-2 justify-items-center-safe`}
                 >
                   {items.image_url.map((image, index) => (
                     <img
                       key={index}
-                      className="w-full h-full  object-fill rounded"
+                      className="w-full h-full object-cover rounded"
                       src={image}
                       alt={`Post image ${index + 1}`}
                     />
                   ))}
 
-                  {like == items._id && (
-                    <div className="absolute items-center justify-center  pointer-events-none ">
-                      <AiFillLike className="relative text-blue-600 top-15 text-6xl sm:text-7xl md:text-8xl animate-bounce z-10" />
+                  {like === items._id && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <AiFillLike className="text-blue-600 text-6xl sm:text-7xl md:text-8xl animate-bounce z-10" />
                     </div>
                   )}
                 </div>
@@ -204,14 +226,13 @@ const Home = () => {
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                   onClick={() => handlelike(items._id)}
                 >
-                  {active === items._id ? (
+                  {/* Fixed: Changed user.id to user._id for consistency */}
+                  {items.likeduser.includes(user._id) ? (
                     <AiFillLike className="text-xl sm:text-2xl text-blue-600" />
                   ) : (
                     <AiOutlineLike className="text-xl sm:text-2xl" />
                   )}
-                  <span className="text-sm sm:text-base">
-                    {items?.like || 0}
-                  </span>
+                  <span className="text-sm sm:text-base">{items?.like}</span>
                 </button>
 
                 {/* Comment */}

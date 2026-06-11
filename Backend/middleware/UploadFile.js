@@ -2,9 +2,9 @@ import multer from "multer";
 import axios from "axios";
 import FormData from "form-data";
 import { v2 as cloudinary } from "cloudinary";
-import dotenv from "dotenv";
+import "dotenv/config"
 
-dotenv.config();
+
 
 const storage = multer.memoryStorage();
 export const upload = multer({ storage });

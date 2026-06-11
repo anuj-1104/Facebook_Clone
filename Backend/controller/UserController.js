@@ -5,7 +5,7 @@ import { Post } from "../model/Post_Model.js";
 import { upload_image } from "../middleware/UploadFile.js";
 import multer from "multer";
 
-const storage = multer.memoryStorage();
+const storage = multer.memoryStorage(); //store in cloudnary?><lk
 export const upload = multer({ storage });
 
 export const userLogin = async (req, res) => {
@@ -280,22 +280,43 @@ export const updateDataPost = async (req, res) => {
 export const update_like = async (req, res) => {
   try {
     const { id } = req.body;
+    const userId = req.user._id;
 
-    const post_Data = await Post.findByIdAndUpdate(
-      id,
-      { $inc: { like: 1 } },
-      { returnDocument: "after" },
-    );
+    const post = await Post.findById(id);
 
-    if (!post_Data) {
-      res.status(404).json({ message: "post not found" });
-      return;
+    if (!post) {
+      return res.status(404).josn({ message: "Post Not Found" });
     }
-    res
-      .status(200)
-      .json({ message: "Like Updated successfully", data: post_Data });
+
+    const alreadyliked = post.likeduser.includes(userId);
+
+    let updatePost;
+
+    if (alreadyliked) {
+      updatePost = await Post.findByIdAndUpdate(
+        id,
+        {
+          $inc: { like: -1 },
+          $pull: { likeduser: userId },
+        },
+        { new: true },
+      );
+    } else {
+      updatePost = await Post.findByIdAndUpdate(
+        id,
+        {
+          $inc: { like: 1 },
+          $addToSet: { likeduser: userId }, // avoids duplicates
+        },
+        { new: true },
+      );
+    }
+    res.status(200).json({
+      message: alreadyliked ? "Unliked successfully" : "Liked successfully",
+      data: updatePost,
+    });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: error.message });
   }
 };
 

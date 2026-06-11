@@ -40,7 +40,7 @@ const Tranding_Page = () => {
 
       if (res.status === 200) {
         setVideos(res.data);
-        setLoading(!loading);
+        setLoading(false);
       }
     } catch (error) {
       console.log(error.message);
